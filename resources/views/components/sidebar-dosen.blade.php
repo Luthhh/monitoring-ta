@@ -8,6 +8,10 @@
         <i class="fas fa-users {{ request()->is('dosen/total-mahasiswa') ? 'active' : '' }}"></i>
     </a>
 
+    <a href="/dosen/profile">
+        <i class="fas fa-user {{ request()->is('dosen/profile') ? 'active' : '' }}"></i>
+    </a>
+    
     <a href="/dosen/monitoring">
         <i class="fas fa-chart-bar {{ request()->is('dosen/monitoring') ? 'active' : '' }}"></i>
     </a>

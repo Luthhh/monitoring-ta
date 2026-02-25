@@ -385,7 +385,7 @@
     </div>
 </div>
 
-{{-- TModal Verifikasi --}}
+{{-- Modal Verifikasi --}}
 <div id="verifikasiModal" class="modal-log">
     <div class="modal-content-log">
 
