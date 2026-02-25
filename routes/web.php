@@ -22,9 +22,26 @@ Route::prefix('admin')->group(function () {
     Route::get('/ideal-mahasiswa', function () {
         return view('admin.a-idealmahasiswa');
     });
+    Route::get('/aktivitas-bimbingan', function () {
+        return view('admin.a-aktivitasbimbingan');
+    });
     Route::get('/behind-mahasiswa', function () {
         return view('admin.a-behindmahasiswa');
     });
+    Route::get('/manajemen-mahasiswa', function () {
+        return view('admin.a-manajemenmahasiswa');
+    });
+    Route::get('/manajemen-dosen', function () {
+        return view('admin.a-manajemendosen');
+    });
+    Route::get('/data-mahasiswa', function () {
+        return view('admin.a-datamahasiswa');
+    });
+    Route::get('/data-dosen', function () {
+        return view('admin.a-datadosen');
+    });
+
+    
 
 });
 
