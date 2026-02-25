@@ -1,87 +1,52 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\DosenController;
 
-
-Route::get('/login', function () {
-    return view('auth.login');
+Route::get('/', function () {
+    return redirect()->route('login');
 });
 
-Route::prefix('admin')->group(function () {
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::get('/dashboard', function () {
-        return view('admin.a-dashboard');
-    });
-    Route::get('/total-mahasiswa', function () {
-        return view('admin.a-totalmahasiswa');
-    });
-    Route::get('/ahead-mahasiswa', function () {
-        return view('admin.a-aheadmahasiswa');
-    });
-    Route::get('/ideal-mahasiswa', function () {
-        return view('admin.a-idealmahasiswa');
-    });
-    Route::get('/behind-mahasiswa', function () {
-        return view('admin.a-behindmahasiswa');
+
+Route::middleware('auth')->group(function () {
+
+    Route::prefix('admin')->group(function () {
+        Route::view('/dashboard', 'admin.a-dashboard');
+        Route::view('/total-mahasiswa', 'admin.a-totalmahasiswa');
+        Route::view('/ahead-mahasiswa', 'admin.a-aheadmahasiswa');
+        Route::view('/ideal-mahasiswa', 'admin.a-idealmahasiswa');
+        Route::view('/behind-mahasiswa', 'admin.a-behindmahasiswa');
     });
 
-});
 
-Route::prefix('dosen')->group(function () {
-
-    Route::get('/dashboard', function () {
-        return view('dosen.d-dashboard');
-    });
-    Route::get('/total-mahasiswa', function () {
-        return view('dosen.d-totalmahasiswa');
-    });
-    Route::get('/ahead-mahasiswa', function () {
-        return view('dosen.d-aheadmahasiswa');
-    });
-    Route::get('/ideal-mahasiswa', function () {
-        return view('dosen.d-idealmahasiswa');
-    });
-    Route::get('/behind-mahasiswa', function () {
-        return view('dosen.d-behindmahasiswa');
-    });
-    Route::get('/profile', function () {
-        return view('dosen.d-profile');
-    });
-    Route::get('/aktivitas-bimbingan', function () {
-        return view('dosen.d-aktivitasbimbingan');
-    });
-    Route::get('/notifikasi', function () {
-        return view('dosen.d-notifikasi');
+    Route::prefix('dosen')->group(function () {
+        Route::view('/dashboard', 'dosen.d-dashboard');
+        Route::view('/total-mahasiswa', 'dosen.d-totalmahasiswa');
+        Route::view('/ahead-mahasiswa', 'dosen.d-aheadmahasiswa');
+        Route::view('/ideal-mahasiswa', 'dosen.d-idealmahasiswa');
+        Route::view('/behind-mahasiswa', 'dosen.d-behindmahasiswa');
+        Route::get('/profile', [DosenController::class, 'profile'])->name('dosen.profile');
+        Route::put('/profile/update', [DosenController::class, 'update'])
+    ->name('dosen.profile.update');
+        Route::view('/aktivitas-bimbingan', 'dosen.d-aktivitasbimbingan');
+        Route::view('/notifikasi', 'dosen.d-notifikasi');
     });
 
-    
+
+    Route::prefix('mahasiswa')->group(function () {
+        Route::view('/dashboard', 'mahasiswa.m-dashboard');
+        Route::view('/tambah-bimbingan', 'mahasiswa.tambah-bimbingan');
+        Route::view('/profile', 'mahasiswa.m-profile');
+        Route::view('/notifikasi', 'mahasiswa.m-notifikasi');
+        Route::view('/detail-mahasiswa', 'mahasiswa.detail-mahasiswa');
+
+        Route::get('/card/{status?}', [MahasiswaController::class, 'index']);
+    });
 
 });
-
-Route::prefix('mahasiswa')->group(function () {
-
-    Route::get('/dashboard', function () {
-        return view('mahasiswa.m-dashboard');
-    });
-
-    Route::get('/tambah-bimbingan', function () {
-        return view('mahasiswa.tambah-bimbingan');
-    });
-    Route::get('/profile', function () {
-        return view('mahasiswa.m-profile');
-    });
-    Route::get('/notifikasi', function () {
-        return view('mahasiswa.m-notifikasi');
-    });
-    Route::get('/card/{status?}', [MahasiswaController::class, 'index']);
-    Route::get('/detail-mahasiswa', function () {
-        return view('mahasiswa.detail-mahasiswa');
-    });
-
-
-    
-
-});
-
-
