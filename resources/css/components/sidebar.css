@@ -1,0 +1,18 @@
+.sidebar {
+    width: 90px;
+    min-height: 100vh;
+    background: #ffffff;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.04);
+}
+
+.sidebar .nav-link {
+    color: #6c757d;
+    padding: 20px 0;
+    font-size: 20px;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background-color: #f1f3ff;
+    color: var(--primary-color);
+}

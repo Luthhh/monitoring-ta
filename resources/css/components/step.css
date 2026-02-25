@@ -1,0 +1,22 @@
+.step-circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.step-circle.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.step-label {
+    font-size: 13px;
+    margin-top: 5px;
+}

@@ -1,0 +1,68 @@
+<div class="sidebar">
+
+    <a href="/dosen/dashboard">
+        <i class="fas fa-home {{ request()->is('dosen/dashboard') ? 'active' : '' }}"></i>
+    </a>
+
+    <a href="/dosen/total-mahasiswa">
+        <i class="fas fa-users {{ request()->is('dosen/total-mahasiswa') ? 'active' : '' }}"></i>
+    </a>
+
+    <a href="/dosen/monitoring">
+        <i class="fas fa-chart-bar {{ request()->is('dosen/monitoring') ? 'active' : '' }}"></i>
+    </a>
+
+    <a href="/dosen/bimbingan">
+        <i class="fas fa-user-graduate {{ request()->is('dosen/bimbingan') ? 'active' : '' }}"></i>
+    </a>
+
+    <a href="/dosen/settings">
+        <i class="fas fa-cog {{ request()->is('dosen/settings') ? 'active' : '' }}"></i>
+    </a>
+
+</div>
+
+<style>
+.sidebar {
+    width: 70px;
+    background: #ffffff;
+    min-height: 100vh;   /* penting */
+    height: 100vh;
+    padding-top: 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    position: sticky; /* penting */
+    top: 0; /* penting */
+}
+
+.sidebar a {
+    text-decoration: none;
+}
+
+.sidebar i {
+    font-size: 18px;
+    margin: 20px 0;
+    color: #6c757d;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.sidebar i:hover {
+    background: #eef2ff;
+    color: #4e73df;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.sidebar i.active {
+    background: #4e73df;
+    color: white;
+    padding: 10px;
+    border-radius: 12px;
+}
+</style>
+
+

@@ -1,0 +1,10 @@
+:root {
+    --primary-color: #4e73df;
+    --secondary-bg: #f8f9fc;
+    --radius: 16px;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--secondary-bg);
+}
