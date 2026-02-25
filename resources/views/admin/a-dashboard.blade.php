@@ -82,7 +82,10 @@
         </select>
     </div>
 
-    <canvas id="statusChart" height="120"></canvas>
+    <!-- wrapper center -->
+    <div class="chart-wrapper">
+        <canvas id="statusChart"></canvas>
+    </div>
 </div>
 
 <div class="box">
@@ -324,10 +327,21 @@ table tbody tr {
     border-radius: 8px;
     border: 1px solid #ccc;
 }
+.chart-wrapper {
+    width: 320px;          /* ukuran sedang */
+    margin: 0 auto;        /* center horizontal */
+    position: relative;
+}
+
+#statusChart {
+    width: 100% !important;
+    height: 320px !important;
+}
 </style>
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
@@ -464,6 +478,7 @@ document.addEventListener("DOMContentLoaded", function() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false, // 🔥 penting banget
             plugins: {
                 legend: {
                     position: 'bottom'
