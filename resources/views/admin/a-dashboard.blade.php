@@ -47,19 +47,23 @@
 
     <!-- 🔴 KRITIS (lebih mencolok) -->
     <div class="kritis-card danger highlight">
-        <div class="kritis-header">
-            <span class="kritis-icon">🚨</span>
-            <span class="kritis-title">Mahasiswa Kritis</span>
-        </div>
-        <div class="kritis-value">{{ $mhsKritis ?? 0 }}</div>
-        <div class="kritis-desc">Butuh perhatian segera</div>
+        <a href="{{ url('/admin/kritis-mahasiswa') }}">
+            <div class="kritis-header">
+                <span class="kritis-icon">🚨</span>
+                <span class="kritis-title">Mahasiswa Kritis</span>
+            </div>
+            <div class="kritis-value">{{ $mhsKritis ?? 0 }}</div>
+            <div class="kritis-desc">Butuh perhatian segera</div>
+        </a>
     </div>
 
     <!-- 🟠 Mendekati -->
     <div class="kritis-card warning">
-        <div class="kritis-title">Mendekati Batas Studi</div>
-        <div class="kritis-value">{{ $mhsMendekati ?? 0 }}</div>
-        <div class="kritis-desc">Perlu monitoring</div>
+        <a href="{{ url('/admin/mendekati-batas-studi') }}">
+            <div class="kritis-title">Mendekati Batas Studi</div>
+            <div class="kritis-value">{{ $mhsMendekati ?? 0 }}</div>
+            <div class="kritis-desc">Perlu monitoring</div>
+        </a>
     </div>
 
     <!-- 🟢 Tepat waktu -->
@@ -322,6 +326,18 @@ table tbody tr {
 .kritis-card.success {
     border-left: 5px solid #27ae60;
 }
+.kritis-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block; /* penting biar seluruh card clickable */
+}
+.kritis-card a:hover,
+.kritis-card a:focus,
+.kritis-card a:visited {
+    text-decoration: none;
+    color: inherit;
+}
+
 #filterAngkatanPie {
     padding: 6px 10px;
     border-radius: 8px;

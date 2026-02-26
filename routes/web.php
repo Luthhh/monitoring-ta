@@ -13,6 +13,9 @@ Route::prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.a-dashboard');
     });
+    route::get('/profile', function () {
+        return view('admin.a-profile');
+    });
     Route::get('/total-mahasiswa', function () {
         return view('admin.a-totalmahasiswa');
     });
@@ -39,6 +42,12 @@ Route::prefix('admin')->group(function () {
     });
     Route::get('/data-dosen', function () {
         return view('admin.a-datadosen');
+    });
+    Route::get('/kritis-mahasiswa', function () {
+        return view('admin.a-kritismahasiswa');
+    });
+    Route::get('/mendekati-batas-studi', function () {
+        return view('admin.a-batasstudi');
     });
 
     
