@@ -1,44 +1,31 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.admin')
 
-@section('title', 'Profil Mahasiswa')
+@section('title', 'Profil Dosen')
 
 @section('page-content')
 
 <div class="container-fluid">
 
-    <h4 class="page-title">Profile Mahasiswa</h4>
+    <h4 class="page-title">Profile Admin</h4>
 
     <div class="card-profile">
 
         <div class="profile-grid">
+            <div class="label">Email</div>
+            <div class="value">andi@kampus.ac.id</div>
 
-            <div class="label">NIM</div>
-            <div class="value">J0403221149</div>
-
-            <div class="label">Nama</div>
-            <div class="value">DINI NURUL AZIZAH</div>
-
-            <div class="label">Tahun Masuk</div>
-            <div class="value">2022/2023</div>
-
-            <div class="label">Judul Penelitian</div>
-            <div class="value">Penelitian sapi vegan go vegan!!!</div>
-
-            <div class="label">Dosen Pembimbing</div>
-            <div class="value">Ibu Popi</div>
-
-            <div class="label">Status Progres</div>
-            <div class="value">Sidang</div>
+            <div class="label">Password</div>
+            <div class="value">****</div>
 
         </div>
 
     </div>
 
     <div class="button-group">
-        <a href="#" class="btn btn-success">
+        <a href="#" class="btn btn-success btn-edit">
             Edit
         </a>
-        <a href="#" class="btn btn-danger">
+        <a href="#" class="btn btn-danger btn-logout">
             Logout
         </a>
     </div>

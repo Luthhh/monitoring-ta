@@ -13,11 +13,16 @@
                 <span>Data Mahasiswa</span>
             </a>
         </li>
-
         <li class="{{ request()->is('admin/manajemen-dosen*') ? 'active' : '' }}">
             <a href="{{ url('/admin/manajemen-dosen') }}">
                 <i class="fas fa-chalkboard-teacher"></i>
                 <span>Data Dosen</span>
+            </a>
+        </li>
+        <li class="{{ request()->is('admin/profile*') ? 'active' : '' }}">
+            <a href="{{ url('/admin/profile') }}">
+                <i class="fas fa-user-circle"></i>
+                <span>Profile</span>
             </a>
         </li>
     </ul>

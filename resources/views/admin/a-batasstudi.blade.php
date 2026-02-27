@@ -6,12 +6,12 @@
 
 
 <div class="page-wrapper">
-    <h2 class="page-title">Detail Aktivitas Bimbingan</h2>
+    <h2 class="page-title">Daftar Mahasiswa Mendekati Batas Studi</h2>
 
     {{--  Mahasiswa > 30 hari --}}
     <div class="card-box">
         <div class="card-header">
-            <span>🔔 Mahasiswa Tidak Bimbingan > 30 Hari</span>
+            <span>🔔 Mahasiswa yang Menedekati Batas Studi</span>
             <span class="badge-danger">2</span>
         </div>
 
@@ -20,34 +20,34 @@
                 <tr>
                     <th>NIM</th>
                     <th>Nama</th>
-                    <th>Terakhir Bimbingan</th>
-                    <th>Milestone</th>
-                    <th>Target Milestone</th>
-                    <th>Status</th>
+                    <th>Tahun Masuk</th>
+                    <th>Semester</th>
+                    <th>Milestone Terakhir</th>
+                    <th>Bimbingan Terakhir</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>2021001</td>
+                    <td>J0403221149</td>
                     <td>Andi Saputra</td>
-                    <td>12 Des 2025</td>
-                    <td>Kolokium</td>
-                    <td>20 Feb 2025</td>
-                    <td><span class="status-badge done">Sudah</span></td>
+                    <td>2021/2022</td>
+                    <td>7</td>
+                    <td>Seminar</td>
+                    <td>3 Juli 2025</td>
                     <td>
                         <button class="btn-remind">Ingatkan</button>
                     </td>
                 </tr>
                 <tr>
-                    <td>2021003</td>
-                    <td>Rina Putri</td>
-                    <td>1 Des 2025</td>
+                    <td>J0403221149</td>
+                    <td>Andi Saputra</td>
+                    <td>2021/2022</td>
+                    <td>7</td>
                     <td>Seminar</td>
-                    <td>20 Feb 2025</td>
-                    <td><span class="status-badge pending">Belum</span></td>
+                    <td>3 Juli 2025</td>
                     <td>
-                    <button class="btn-remind">Ingatkan</button>
+                        <button class="btn-remind">Ingatkan</button>
                     </td>
                 </tr>
             </tbody>

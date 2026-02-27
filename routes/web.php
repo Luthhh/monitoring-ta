@@ -16,14 +16,51 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
 
-    Route::prefix('admin')->group(function () {
-        Route::view('/dashboard', 'admin.a-dashboard');
-        Route::view('/total-mahasiswa', 'admin.a-totalmahasiswa');
-        Route::view('/ahead-mahasiswa', 'admin.a-aheadmahasiswa');
-        Route::view('/ideal-mahasiswa', 'admin.a-idealmahasiswa');
-        Route::view('/behind-mahasiswa', 'admin.a-behindmahasiswa');
+Route::prefix('admin')->group(function () {
+
+    Route::get('/dashboard', function () {
+        return view('admin.a-dashboard');
+    });
+    route::get('/profile', function () {
+        return view('admin.a-profile');
+    });
+    Route::get('/total-mahasiswa', function () {
+        return view('admin.a-totalmahasiswa');
+    });
+    Route::get('/ahead-mahasiswa', function () {
+        return view('admin.a-aheadmahasiswa');
+    });
+    Route::get('/ideal-mahasiswa', function () {
+        return view('admin.a-idealmahasiswa');
+    });
+    Route::get('/aktivitas-bimbingan', function () {
+        return view('admin.a-aktivitasbimbingan');
+    });
+    Route::get('/behind-mahasiswa', function () {
+        return view('admin.a-behindmahasiswa');
+    });
+    Route::get('/manajemen-mahasiswa', function () {
+        return view('admin.a-manajemenmahasiswa');
+    });
+    Route::get('/manajemen-dosen', function () {
+        return view('admin.a-manajemendosen');
+    });
+    Route::get('/data-mahasiswa', function () {
+        return view('admin.a-datamahasiswa');
+    });
+    Route::get('/data-dosen', function () {
+        return view('admin.a-datadosen');
+    });
+    Route::get('/kritis-mahasiswa', function () {
+        return view('admin.a-kritismahasiswa');
+    });
+    Route::get('/mendekati-batas-studi', function () {
+        return view('admin.a-batasstudi');
     });
 
+    
+
+});
 
     Route::prefix('dosen')->group(function () {
         Route::view('/dashboard', 'dosen.d-dashboard');
