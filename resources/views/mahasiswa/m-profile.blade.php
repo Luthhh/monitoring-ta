@@ -4,50 +4,6 @@
 
 @section('page-content')
 
-<div class="container-fluid">
-
-    <h4 class="page-title">Profile Mahasiswa</h4>
-
-    <div class="card-profile">
-
-        <div class="profile-grid">
-
-            <div class="label">NIM</div>
-            <div class="value">J0403221149</div>
-
-            <div class="label">Nama</div>
-            <div class="value">DINI NURUL AZIZAH</div>
-
-            <div class="label">Tahun Masuk</div>
-            <div class="value">2022/2023</div>
-
-            <div class="label">Judul Penelitian</div>
-            <div class="value">Penelitian sapi vegan go vegan!!!</div>
-
-            <div class="label">Dosen Pembimbing</div>
-            <div class="value">Ibu Popi</div>
-
-            <div class="label">Status Progres</div>
-            <div class="value">Sidang</div>
-
-        </div>
-
-    </div>
-
-    <div class="button-group">
-        <a href="#" class="btn btn-success">
-            Edit
-        </a>
-        <a href="#" class="btn btn-danger">
-            Logout
-        </a>
-    </div>
-
-</div>
-
-@endsection
-
-@push('styles')
 <style>
 .page-title {
     margin-bottom: 25px;
@@ -98,4 +54,47 @@
     }
 }
 </style>
-@endpush
+
+
+<div class="container-fluid">
+
+    <h4 class="page-title">Biodata Mahasiswa</h4>
+
+    <div class="card-profile">
+
+        <div class="profile-grid">
+
+            <div class="label">NIM</div>
+            <div class="value">J0403221149</div>
+
+            <div class="label">Nama</div>
+            <div class="value">DINI NURUL AZIZAH</div>
+
+            <div class="label">Tahun Masuk</div>
+            <div class="value">2022/2023</div>
+
+            <div class="label">Judul Penelitian</div>
+            <div class="value">Penelitian sapi vegan go vegan!!!</div>
+
+            <div class="label">Dosen Pembimbing</div>
+            <div class="value">Ibu Popi</div>
+
+            <div class="label">Status Progres</div>
+            <div class="value">Sidang</div>
+
+        </div>
+
+    </div>
+
+    <div class="button-group">
+        <a href="#" class="btn btn-success">
+            Edit
+        </a>
+        <a href="#" class="btn btn-danger">
+            Logout
+        </a>
+    </div>
+
+</div>
+
+@endsection

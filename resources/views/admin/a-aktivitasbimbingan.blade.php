@@ -281,35 +281,50 @@
     table-layout: fixed; /* ⭐⭐⭐ INI KUNCI UTAMA */
 }
 
-.table-custom th {
-    background: #f8f9fc;
-    padding: 10px;
-    font-size: 13px;
-    text-align: center;
-    color: #6c757d;
-}
-
+.table-custom th,
 .table-custom td {
     padding: 10px;
-    border-top: 1px solid #eee;
-    font-size: 14px;
-    word-wrap: break-word;
-}
-
-table th, table td {
-    padding: 14px;
-    text-align: center;
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-table td:nth-child(2)  {
-    text-align: left;
-}
-
-
-td {
     word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal; /* ⭐ penting */
+    vertical-align: top;
+}
+
+/* ====== LOCK COLUMN WIDTH ====== */
+
+.table-custom th:nth-child(1),
+.table-custom td:nth-child(1) {
+    width: 110px; /* NIM */
+}
+
+.table-custom th:nth-child(2),
+.table-custom td:nth-child(2) {
+    width: 200px; /* Nama */
+}
+
+.table-custom th:nth-child(3),
+.table-custom td:nth-child(3) {
+    width: 150px; /* Terakhir */
+}
+
+.table-custom th:nth-child(4),
+.table-custom td:nth-child(4) {
+    width: 160px; /* Milestone */
+}
+
+.table-custom th:nth-child(5),
+.table-custom td:nth-child(5) {
+    width: 150px; /* Target */
+}
+
+.table-custom th:nth-child(6),
+.table-custom td:nth-child(6) {
+    width: 120px; /* Status */
+}
+
+.table-custom th:nth-child(7),
+.table-custom td:nth-child(7) {
+    width: 130px; /* Aksi */
 }
 
 

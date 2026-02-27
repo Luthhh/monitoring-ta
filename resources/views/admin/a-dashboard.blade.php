@@ -47,23 +47,19 @@
 
     <!-- 🔴 KRITIS (lebih mencolok) -->
     <div class="kritis-card danger highlight">
-        <a href="{{ url('/admin/kritis-mahasiswa') }}">
-            <div class="kritis-header">
-                <span class="kritis-icon">🚨</span>
-                <span class="kritis-title">Mahasiswa Kritis</span>
-            </div>
-            <div class="kritis-value">{{ $mhsKritis ?? 0 }}</div>
-            <div class="kritis-desc">Butuh perhatian segera</div>
-        </a>
+        <div class="kritis-header">
+            <span class="kritis-icon">🚨</span>
+            <span class="kritis-title">Mahasiswa Kritis</span>
+        </div>
+        <div class="kritis-value">{{ $mhsKritis ?? 0 }}</div>
+        <div class="kritis-desc">Butuh perhatian segera</div>
     </div>
 
     <!-- 🟠 Mendekati -->
     <div class="kritis-card warning">
-        <a href="{{ url('/admin/mendekati-batas-studi') }}">
-            <div class="kritis-title">Mendekati Batas Studi</div>
-            <div class="kritis-value">{{ $mhsMendekati ?? 0 }}</div>
-            <div class="kritis-desc">Perlu monitoring</div>
-        </a>
+        <div class="kritis-title">Mendekati Batas Studi</div>
+        <div class="kritis-value">{{ $mhsMendekati ?? 0 }}</div>
+        <div class="kritis-desc">Perlu monitoring</div>
     </div>
 
     <!-- 🟢 Tepat waktu -->
@@ -86,10 +82,7 @@
         </select>
     </div>
 
-    <!-- wrapper center -->
-    <div class="chart-wrapper">
-        <canvas id="statusChart"></canvas>
-    </div>
+    <canvas id="statusChart" height="120"></canvas>
 </div>
 
 <div class="box">
@@ -326,38 +319,15 @@ table tbody tr {
 .kritis-card.success {
     border-left: 5px solid #27ae60;
 }
-.kritis-card a {
-    text-decoration: none;
-    color: inherit;
-    display: block; /* penting biar seluruh card clickable */
-}
-.kritis-card a:hover,
-.kritis-card a:focus,
-.kritis-card a:visited {
-    text-decoration: none;
-    color: inherit;
-}
-
 #filterAngkatanPie {
     padding: 6px 10px;
     border-radius: 8px;
     border: 1px solid #ccc;
 }
-.chart-wrapper {
-    width: 320px;          /* ukuran sedang */
-    margin: 0 auto;        /* center horizontal */
-    position: relative;
-}
-
-#statusChart {
-    width: 100% !important;
-    height: 320px !important;
-}
 </style>
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
@@ -494,7 +464,6 @@ document.addEventListener("DOMContentLoaded", function() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false, // 🔥 penting banget
             plugins: {
                 legend: {
                     position: 'bottom'

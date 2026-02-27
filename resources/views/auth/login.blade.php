@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Login Student Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         * {
@@ -123,6 +126,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="left">
@@ -136,32 +140,39 @@
         <div class="login-box">
             <h2>Login Student Portal</h2>
 
-            <form>
-                <div class="form-group">
-                    <label>ID Pengguna</label>
-                    <input type="text" placeholder="Username">
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="Email" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" placeholder="Password">
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Password" required>
                 </div>
 
-                <div class="row">
-                    <div>
-                        <input type="checkbox"> Remember me
+                <div class="d-flex justify-content-between mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="remember">
+                        <label class="form-check-label">Remember me</label>
                     </div>
+
                     <a href="#">Lupa Kata Sandi?</a>
                 </div>
 
-                <button type="submit" class="btn">Masuk</button>
+                <button type="submit" class="btn btn-primary w-100">
+                    Masuk
+                </button>
 
-                <div class="version">
-                    Versi 20250411.2
+                <div class="text-center text-muted mt-3">
+                    Versi 2026.1.0
                 </div>
             </form>
         </div>
     </div>
 
 </body>
+
 </html>

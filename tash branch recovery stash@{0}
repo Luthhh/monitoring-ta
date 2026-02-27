@@ -1,0 +1,100 @@
+[1mdiff --git a/routes/web.php b/routes/web.php[m
+[1mindex 461b1aa..e4ea81b 100644[m
+[1m--- a/routes/web.php[m
+[1m+++ b/routes/web.php[m
+[36m@@ -4,6 +4,7 @@[m
+ use App\Http\Controllers\AuthController;[m
+ use App\Http\Controllers\MahasiswaController;[m
+ use App\Http\Controllers\DosenController;[m
+[32m+[m[32muse App\Http\Controllers\AdminController;[m
+ [m
+ Route::get('/', function () {[m
+     return redirect()->route('login');[m
+[36m@@ -16,61 +17,34 @@[m
+ [m
+ Route::middleware('auth')->group(function () {[m
+ [m
+[31m-Route::prefix('admin')->group(function () {[m
+[31m-[m
+[31m-    Route::get('/dashboard', function () {[m
+[31m-        return view('admin.a-dashboard');[m
+[31m-    });[m
+[31m-    route::get('/profile', function () {[m
+[31m-        return view('admin.a-profile');[m
+[31m-    });[m
+[31m-    Route::get('/total-mahasiswa', function () {[m
+[31m-        return view('admin.a-totalmahasiswa');[m
+[31m-    });[m
+[31m-    Route::get('/ahead-mahasiswa', function () {[m
+[31m-        return view('admin.a-aheadmahasiswa');[m
+[31m-    });[m
+[31m-    Route::get('/ideal-mahasiswa', function () {[m
+[31m-        return view('admin.a-idealmahasiswa');[m
+[31m-    });[m
+[31m-    Route::get('/aktivitas-bimbingan', function () {[m
+[31m-        return view('admin.a-aktivitasbimbingan');[m
+[31m-    });[m
+[31m-    Route::get('/behind-mahasiswa', function () {[m
+[31m-        return view('admin.a-behindmahasiswa');[m
+[31m-    });[m
+[31m-    Route::get('/manajemen-mahasiswa', function () {[m
+[31m-        return view('admin.a-manajemenmahasiswa');[m
+[32m+[m[32m    Route::prefix('admin')->group(function () {[m
+[32m+[m[32m        Route::view('/dashboard', 'admin.a-dashboard');[m
+[32m+[m[32m        Route::view('/total-mahasiswa', 'admin.a-totalmahasiswa');[m
+[32m+[m[32m        Route::view('/ahead-mahasiswa', 'admin.a-aheadmahasiswa');[m
+[32m+[m[32m        Route::view('/ideal-mahasiswa', 'admin.a-idealmahasiswa');[m
+[32m+[m[32m        Route::view('/behind-mahasiswa', 'admin.a-behindmahasiswa');[m
+[32m+[m[32m        Route::view('/manajemen-mahasiswa', 'admin.a-manajemenmahasiswa');[m
+[32m+[m[32m        Route::get('/manajemen-dosen', [AdminController::class, 'index'])[m
+[32m+[m[32m            ->name('admin.manajemen-dosen');[m
+[32m+[m[32m        Route::post('/admin/dosen/store', [AdminController::class, 'store'])[m
+[32m+[m[32m            ->name('admin.dosen.store');[m
+[32m+[m[32m        Route::put('/admin/dosen/{id}', [AdminController::class, 'update'])[m
+[32m+[m[32m            ->name('admin.dosen.update');[m
+[32m+[m[32m        Route::delete('/admin/dosen/{id}', [AdminController::class, 'destroy'])[m
+[32m+[m[32m            ->name('admin.dosen.destroy');[m
+     });[m
+[31m-    Route::get('/manajemen-dosen', function () {[m
+[31m-        return view('admin.a-manajemendosen');[m
+[31m-    });[m
+[31m-    Route::get('/data-mahasiswa', function () {[m
+[31m-        return view('admin.a-datamahasiswa');[m
+[31m-    });[m
+[31m-    Route::get('/data-dosen', function () {[m
+[31m-        return view('admin.a-datadosen');[m
+[31m-    });[m
+[31m-    Route::get('/kritis-mahasiswa', function () {[m
+[31m-        return view('admin.a-kritismahasiswa');[m
+[31m-    });[m
+[31m-    Route::get('/mendekati-batas-studi', function () {[m
+[31m-        return view('admin.a-batasstudi');[m
+[31m-    });[m
+[31m-[m
+[31m-    [m
+ [m
+[31m-});[m
+ [m
+     Route::prefix('dosen')->group(function () {[m
+         Route::view('/dashboard', 'dosen.d-dashboard');[m
+[31m-        Route::view('/total-mahasiswa', 'dosen.d-totalmahasiswa');[m
+[32m+[m[32m        Route::get('/total-mahasiswa',[m
+[32m+[m[32m        [DosenController::class, 'totalMahasiswa']);[m
+         Route::view('/ahead-mahasiswa', 'dosen.d-aheadmahasiswa');[m
+         Route::view('/ideal-mahasiswa', 'dosen.d-idealmahasiswa');[m
+         Route::view('/behind-mahasiswa', 'dosen.d-behindmahasiswa');[m
+         Route::get('/profile', [DosenController::class, 'profile'])->name('dosen.profile');[m
+         Route::put('/profile/update', [DosenController::class, 'update'])[m
+[31m-    ->name('dosen.profile.update');[m
+[32m+[m[32m            ->name('dosen.profile.update');[m
+         Route::view('/aktivitas-bimbingan', 'dosen.d-aktivitasbimbingan');[m
+         Route::view('/notifikasi', 'dosen.d-notifikasi');[m
+     });[m
+[36m@@ -82,7 +56,6 @@[m
+         Route::view('/profile', 'mahasiswa.m-profile');[m
+         Route::view('/notifikasi', 'mahasiswa.m-notifikasi');[m
+         Route::view('/detail-mahasiswa', 'mahasiswa.detail-mahasiswa');[m
+[31m-[m
+         Route::get('/card/{status?}', [MahasiswaController::class, 'index']);[m
+     });[m
+ [m
