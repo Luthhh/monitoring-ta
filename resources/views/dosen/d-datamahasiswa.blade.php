@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.dosen')
 
 @section('title', 'Data Mahasiswa')
 
@@ -65,10 +65,6 @@
     <div class="card">
         <div class="card-title-flex">
             <h3 class="section-title">👤 Informasi Mahasiswa</h3>
-            <div class="card-actions">
-                <button class="btn-edit">Edit</button>
-                <button class="btn-delete">Hapus</button>
-            </div>
         </div>
 
         <div class="info-grid">

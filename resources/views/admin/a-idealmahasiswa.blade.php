@@ -6,7 +6,7 @@
 
 <div class="main">
 
-    <h1>Daftar Mahasiswa</h1>
+    <h1>Ideal</h1>
 
     <!-- Statistik -->
     <div class="stat-card stat-yellow">
@@ -56,13 +56,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr onclick="window.location='{{ url('/admin/data-mahasiswa') }}'">
                     <td>1</td>
                     <td>2020/2021</td>
                     <td>J0403221143</td>
-                    <td>
-                        <span class="role-badge p1">P1</span>
-                        Dini Nurul Azizah</td>
+                    <td>Dini Nurul Azizah</td>
                     <td>4</td>
                     <td>
                         <span class="badge badge-yellow">
@@ -71,11 +69,11 @@
                     </td>
                     <td class="action-buttons">
                         <!-- Lihat -->
-                        <button class="btn-icon btn-view">
+                        <button class="btn-icon btn-view" onclick="event.stopPropagation()">
                             <i class="fas fa-eye"></i>
                         </button>
                         <!-- Remind -->
-                        <button class="btn-icon btn-alert">
+                        <button class="btn-icon btn-alert" onclick="event.stopPropagation()">
                             <i class="fas fa-bell"></i>
                         </button>
                     </td>
@@ -99,10 +97,6 @@
     border-radius: 12px;
     margin-bottom: 25px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
-
-.stat-red {
-    background: #e74a3b;
 }
 
 .card {
@@ -131,6 +125,7 @@ table thead {
 
 table tbody tr {
     border-bottom: 1px solid #eee;
+    cursor: pointer;
 }
 
 td:nth-child(4) {
@@ -221,16 +216,6 @@ td {
     border-radius: 6px;
     margin-left: 6px;
     font-weight: 600;
-}
-
-.role-badge.p1 {
-    background: #e8f0ff;
-    color: #3b4cca;
-}
-
-.role-badge.p2 {
-    background: #e6f4ea;
-    color: #1cc88a;
 }
 
 

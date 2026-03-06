@@ -6,7 +6,7 @@
 
 <div class="main">
 
-    <h1>Daftar Mahasiswa</h1>
+    <h1>Ahead</h1>
 
     <!-- Statistik -->
     <div class="stat-card stat-green">
@@ -55,14 +55,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr onclick="window.location='{{ url('/admin/data-mahasiswa') }}'">
                     <td>1</td>
                     <td>2020/2021</td>
                     <td>J0403221143</td>
-                    <td>
-                        <span class="role-badge p1">P1</span>
-                        Dini Nurul Azizah
-                    </td>
+                    <td>Dini Nurul Azizah</td>
                     <td>4</td>
                     <td>
                         <span class="badge">
@@ -71,11 +68,11 @@
                     </td>
                     <td class="action-buttons">
                         <!-- Lihat -->
-                        <button class="btn-icon btn-view">
+                        <button class="btn-icon btn-view" onclick="event.stopPropagation()">
                             <i class="fas fa-eye"></i>
                         </button>
                         <!-- Remind -->
-                        <button class="btn-icon btn-alert">
+                        <button class="btn-icon btn-alert" onclick="event.stopPropagation()">
                             <i class="fas fa-bell"></i>
                         </button>
                     </td>
@@ -86,7 +83,6 @@
 </div>
 
 <style>
-
 .main {
     padding: 30px;
 }
@@ -100,12 +96,9 @@
     box-shadow: 0 5px 15px rgba(0,0,0,0.08);
 }
 
-
 .stat-green {
     background: #00a806;
 }
-
-
 
 .stat-card h2 {
     font-size: 32px;
@@ -126,7 +119,8 @@ table {
     margin-top: 15px;
 }
 
-table th, table td {
+table th,
+table td {
     padding: 14px;
     text-align: center;
     font-size: 14px;
@@ -139,25 +133,19 @@ table thead {
 
 table tbody tr {
     border-bottom: 1px solid #eee;
+    cursor: pointer;
 }
 
-td:nth-child(4) {
+/* Kolom nama */
+table td:nth-child(4) {
     max-width: 200px;
     word-break: break-word;
+    text-align: left;
 }
 
 /* Kolom milestone */
 td:nth-child(6) {
     max-width: 220px;
-}
-
-table td:nth-child(4)  {
-    text-align: left;
-}
-
-
-td {
-    word-break: break-word;
 }
 
 /* Badge */
@@ -170,25 +158,7 @@ td {
     display: inline-block;
 }
 
-/* Button */
-.aksi button {
-    border: none;
-    padding: 8px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-right: 5px;
-}
-
-.btn-view {
-    background: #4b7bec;
-    color: white;
-}
-
-.btn-alert {
-    background: #f39c12;
-    color: white;
-}
-
+/* Button icon */
 .btn-icon {
     border: none;
     width: 34px;
@@ -203,23 +173,24 @@ td {
     transition: 0.2s;
 }
 
-/* Warna */
+/* Warna tombol */
 .btn-view {
     background: #0dcaf0;
 }
 
 .btn-alert {
     background: #f39c12;
-    color: white;
 }
 
+/* Action buttons */
 .action-buttons {
     display: flex;
-    gap: 2px;          /* jarak antar tombol */
-    justify-content: center; /* kalau mau di tengah */
+    gap: 2px;
+    justify-content: center;
     align-items: center;
 }
 
+/* Tools */
 .table-tools {
     display: flex;
     gap: 12px;
@@ -233,6 +204,8 @@ td {
     border-radius: 8px;
     font-size: 14px;
 }
+
+/* Role badge */
 .role-badge {
     font-size: 11px;
     padding: 2px 6px;
@@ -240,17 +213,6 @@ td {
     margin-left: 6px;
     font-weight: 600;
 }
-
-.role-badge.p1 {
-    background: #e8f0ff;
-    color: #3b4cca;
-}
-
-.role-badge.p2 {
-    background: #e6f4ea;
-    color: #1cc88a;
-}
-
 </style>
 
 @endsection

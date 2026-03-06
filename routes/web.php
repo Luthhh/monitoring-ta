@@ -49,6 +49,9 @@ Route::prefix('admin')->group(function () {
     Route::get('/mendekati-batas-studi', function () {
         return view('admin.a-batasstudi');
     });
+    Route::get('/ontrack-mahasiswa', function () {
+        return view('admin.a-ontrackmahasiswa');
+    });
 
     
 
@@ -80,6 +83,9 @@ Route::prefix('dosen')->group(function () {
     Route::get('/notifikasi', function () {
         return view('dosen.d-notifikasi');
     });
+    Route::get('/data-mahasiswa', function () {
+        return view('dosen.d-datamahasiswa');
+    });
 
     
 
@@ -100,7 +106,6 @@ Route::prefix('mahasiswa')->group(function () {
     Route::get('/notifikasi', function () {
         return view('mahasiswa.m-notifikasi');
     });
-    Route::get('/card/{status?}', [MahasiswaController::class, 'index']);
     Route::get('/detail-mahasiswa', function () {
         return view('mahasiswa.detail-mahasiswa');
     });

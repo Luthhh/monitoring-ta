@@ -34,11 +34,6 @@
             <option value="7">Semester 7</option>
             <option value="8">Semester 8</option>
         </select>
-        <select id="sortPeran">
-            <option value="">Peran Semua</option>
-            <option value="P1">Pembimbing 1</option>
-            <option value="P2">Pembimbing 2</option>
-        </select>
     </div>
 
     <div class="card">
@@ -55,7 +50,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>1</td>
                     <td>2020/2021</td>
                     <td>J0403221143</td>
@@ -233,6 +228,10 @@ td {
     border-radius: 8px;
     font-size: 14px;
 }
+table tbody tr {
+    cursor: pointer;
+}
+
 .role-badge {
     font-size: 11px;
     padding: 2px 6px;

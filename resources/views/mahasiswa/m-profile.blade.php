@@ -21,10 +21,16 @@
             <div class="label">Tahun Masuk</div>
             <div class="value">2022/2023</div>
 
+            <div class="label">Semester</div>
+            <div class="value">8</div>
+
             <div class="label">Judul Penelitian</div>
             <div class="value">Penelitian sapi vegan go vegan!!!</div>
 
-            <div class="label">Dosen Pembimbing</div>
+            <div class="label">Dosen Pembimbing 1</div>
+            <div class="value">Ibu Popi</div>
+
+            <div class="label">Dosen Pembimbing 2</div>
             <div class="value">Ibu Popi</div>
 
             <div class="label">Status Progres</div>

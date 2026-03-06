@@ -10,13 +10,13 @@
         <li class="{{ request()->is('admin/manajemen-mahasiswa*') ? 'active' : '' }}">
             <a href="{{ url('/admin/manajemen-mahasiswa') }}">
                 <i class="fas fa-user-graduate"></i>
-                <span>Data Mahasiswa</span>
+                <span>Manajemen Mahasiswa</span>
             </a>
         </li>
         <li class="{{ request()->is('admin/manajemen-dosen*') ? 'active' : '' }}">
             <a href="{{ url('/admin/manajemen-dosen') }}">
                 <i class="fas fa-chalkboard-teacher"></i>
-                <span>Data Dosen</span>
+                <span>Manajemen Dosen</span>
             </a>
         </li>
         <li class="{{ request()->is('admin/profile*') ? 'active' : '' }}">

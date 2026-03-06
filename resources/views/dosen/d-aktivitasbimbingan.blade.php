@@ -82,7 +82,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>2021001</td>
                     <td>
                         <span class="role-badge p1">P1</span>
@@ -96,7 +96,7 @@
                         <button class="btn-remind">Ingatkan</button>
                     </td>
                 </tr>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>2021003</td>
                     <td>
                         <span class="role-badge p2">P2</span>
@@ -134,7 +134,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>2021002</td>
                     <td>
                         <span class="role-badge p1">P1</span>
@@ -150,7 +150,7 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>2748328</td>
                     <td>
                         <span class="role-badge p2">P2</span>
@@ -166,7 +166,7 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>2387472</td>
                     <td>
                         <span class="role-badge p2">P2</span>
@@ -257,6 +257,9 @@
     padding: 10px;
     border-top: 1px solid #eee;
     font-size: 14px;
+}
+table tbody tr {
+    cursor: pointer;
 }
 
 /* STATUS */

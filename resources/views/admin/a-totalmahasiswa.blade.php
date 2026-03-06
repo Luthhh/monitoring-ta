@@ -56,7 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr onclick="window.location='{{ url('/admin/data-mahasiswa') }}'">
                     <td>1</td>
                     <td>2020/2021</td>
                     <td>J0403221143</td>
@@ -77,7 +77,7 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
+                <tr onclick="window.location='{{ url('/admin/data-mahasiswa') }}'">
                     <td>2</td>
                     <td>2020/2021</td>
                     <td>J0403221143</td>
@@ -147,6 +147,7 @@ table thead {
 
 table tbody tr {
     border-bottom: 1px solid #eee;
+    cursor: pointer;
 }
 
 td:nth-child(4) {

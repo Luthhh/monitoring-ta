@@ -4,10 +4,6 @@
 
 @section('page-content')
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <div class="topbar">
     <h1>Dashboard Admin</h1>
     <div>Admin User</div>
@@ -68,9 +64,11 @@
 
     <!-- 🟢 Tepat waktu -->
     <div class="kritis-card success">
-        <div class="kritis-title">On Track Tepat Waktu</div>
-        <div class="kritis-value">{{ $mhsTepatWaktu ?? 0 }}</div>
-        <div class="kritis-desc">Kinerja baik</div>
+        <a href="{{ url('/admin/ontrack-mahasiswa') }}">
+            <div class="kritis-title">On Track Tepat Waktu</div>
+            <div class="kritis-value">{{ $mhsTepatWaktu ?? 0 }}</div>
+            <div class="kritis-desc">Kinerja baik</div>
+        </a>
     </div>
 
 </div>
@@ -111,10 +109,6 @@
 
 @push('scripts')
 <style>
-.main {
-    background: #f4f6fb;
-    padding: 30px;
-}
 
 .topbar {
     display: flex;
@@ -139,7 +133,7 @@
 .blue { background: #02048d; }
 .green { background: #00a806; }
 .yellow { background: #f6c23e; color: #000; }
-.red { background: #ff1500; }
+.red { background: #e91603; }
 
 .card h2 {
     font-size: 28px;
@@ -165,26 +159,6 @@
     border-radius: 8px;
     border: 1px solid #ccc;
 }
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-table th, table td {
-    padding: 12px;
-    font-size: 14px;
-}
-
-table thead {
-    background: #f1f2f6;
-}
-
-table tbody tr {
-    border-bottom: 1px solid #eee;
-}
-
 .aksi button {
     border: none;
     padding: 8px 10px;
@@ -352,6 +326,9 @@ table tbody tr {
 #statusChart {
     width: 100% !important;
     height: 320px !important;
+}
+.table-custom tbody tr {
+    cursor: pointer;
 }
 </style>
 @endpush

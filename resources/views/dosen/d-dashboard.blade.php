@@ -106,7 +106,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>J0403221149</td>
                     <td>
                         <span class="role-badge p1">P1</span>
@@ -131,7 +131,7 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>J0403221150</td>
                     <td>
                         <span class="role-badge p2">P2</span>
@@ -156,7 +156,7 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>J0403221151</td>
                     <td>
                         <span class="role-badge p2">P2</span>
@@ -181,7 +181,7 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>J0403221152</td>
                     <td>
                         <span class="role-badge p1">P1</span>
@@ -206,7 +206,7 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>J0403221153</td>
                     <td>
                         <span class="role-badge p1">P1</span>
@@ -728,7 +728,9 @@ table td:nth-child(2)  {
 td {
     word-break: break-word;
 }
-
+table tbody tr {
+    cursor: pointer;
+}
 
 /* STATUS BADGE */
 .status-badge {

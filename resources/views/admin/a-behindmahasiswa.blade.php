@@ -6,7 +6,7 @@
 
 <div class="main">
 
-    <h1>Daftar Mahasiswa</h1>
+    <h1>Behind</h1>
 
     <!-- Statistik -->
     <div class="stat-card stat-red">
@@ -34,11 +34,6 @@
             <option value="7">Semester 7</option>
             <option value="8">Semester 8</option>
         </select>
-        <select id="sortPeran">
-            <option value="">Peran Semua</option>
-            <option value="P1">Pembimbing 1</option>
-            <option value="P2">Pembimbing 2</option>
-        </select>
     </div>
 
     <!-- Tabel -->
@@ -56,13 +51,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr onclick="window.location='{{ url('/admin/data-mahasiswa') }}'">
                     <td>1</td>
                     <td>2020/2021</td>
                     <td>J0403221143</td>
-                    <td>
-                        <span class="role-badge p1">P1</span>
-                        Dini Nurul Azizah</td>
+                    <td>Dini Nurul Azizah</td>
                     <td>4</td>
                     <td>
                         <span class="badge badge-red">
@@ -71,11 +64,11 @@
                     </td>
                     <td class="action-buttons">
                         <!-- Lihat -->
-                        <button class="btn-icon btn-view">
+                        <button class="btn-icon btn-view" onclick="event.stopPropagation()">
                             <i class="fas fa-eye"></i>
                         </button>
                         <!-- Remind -->
-                        <button class="btn-icon btn-alert">
+                        <button class="btn-icon btn-alert" onclick="event.stopPropagation()">
                             <i class="fas fa-bell"></i>
                         </button>
                     </td>
@@ -87,7 +80,7 @@
 </div>
 
 <style>
-    .main {
+.main {
     padding: 30px;
 }
 
@@ -110,44 +103,40 @@
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
-table {
+/* ✅ scope tabel */
+#tabelMahasiswa {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
 }
 
-table th, table td {
+#tabelMahasiswa th,
+#tabelMahasiswa td {
     padding: 14px;
     text-align: center;
     font-size: 14px;
     vertical-align: middle;
+    word-break: break-word;
 }
 
-table thead {
+#tabelMahasiswa thead {
     background: #f1f2f6;
 }
 
-table tbody tr {
+#tabelMahasiswa tbody tr {
     border-bottom: 1px solid #eee;
+    cursor: pointer;
 }
 
-td:nth-child(4) {
-    max-width: 200px;
-    word-break: break-word;
-}
-
-/* Kolom milestone */
-td:nth-child(6) {
-    max-width: 220px;
-}
-
-table td:nth-child(4)  {
+/* kolom nama rata kiri */
+#tabelMahasiswa td:nth-child(4) {
     text-align: left;
+    max-width: 200px;
 }
 
-
-td {
-    word-break: break-word;
+/* kolom milestone */
+#tabelMahasiswa td:nth-child(6) {
+    max-width: 220px;
 }
 
 .badge {
@@ -176,20 +165,18 @@ td {
     transition: 0.2s;
 }
 
-/* Warna */
 .btn-view {
     background: #0dcaf0;
 }
 
 .btn-alert {
     background: #f39c12;
-    color: white;
 }
 
 .action-buttons {
     display: flex;
-    gap: 2px;          /* jarak antar tombol */
-    justify-content: center; /* kalau mau di tengah */
+    gap: 2px;
+    justify-content: center;
     align-items: center;
 }
 
@@ -205,24 +192,6 @@ td {
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 14px;
-}
-
-.role-badge {
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    margin-left: 6px;
-    font-weight: 600;
-}
-
-.role-badge.p1 {
-    background: #e8f0ff;
-    color: #3b4cca;
-}
-
-.role-badge.p2 {
-    background: #e6f4ea;
-    color: #1cc88a;
 }
 
 </style>

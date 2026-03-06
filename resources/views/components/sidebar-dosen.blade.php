@@ -11,18 +11,6 @@
     <a href="/dosen/profile">
         <i class="fas fa-user {{ request()->is('dosen/profile') ? 'active' : '' }}"></i>
     </a>
-    
-    <a href="/dosen/monitoring">
-        <i class="fas fa-chart-bar {{ request()->is('dosen/monitoring') ? 'active' : '' }}"></i>
-    </a>
-
-    <a href="/dosen/bimbingan">
-        <i class="fas fa-user-graduate {{ request()->is('dosen/bimbingan') ? 'active' : '' }}"></i>
-    </a>
-
-    <a href="/dosen/settings">
-        <i class="fas fa-cog {{ request()->is('dosen/settings') ? 'active' : '' }}"></i>
-    </a>
 
 </div>
 

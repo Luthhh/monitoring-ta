@@ -56,7 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>1</td>
                     <td>2020/2021</td>
                     <td>J0403221143</td>
@@ -77,7 +77,7 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
+                <tr onclick="window.location='{{ url('/dosen/data-mahasiswa') }}'">
                     <td>2</td>
                     <td>2020/2021</td>
                     <td>J0403221143</td>
@@ -223,7 +223,9 @@ td {
     border-radius: 8px;
     font-size: 14px;
 }
-
+table tbody tr {
+    cursor: pointer;
+}
 .role-badge {
     font-size: 11px;
     padding: 2px 6px;
