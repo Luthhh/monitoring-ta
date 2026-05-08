@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Role;
 use App\Models\Dosen;
 use App\Models\Mahasiswa;
+use App\Models\TugasAkhir;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
@@ -20,7 +21,7 @@ class UserSeeder extends Seeder
         // ================= ADMIN =================
         User::create([
             'name' => 'Admin Monitoring',
-            'email' => 'admin@monitoring.com',
+            'email' => 'admin@apps.ipb.ac.id',
             'password' => Hash::make('password'),
             'role_id' => $adminRole->id,
         ]);
@@ -28,7 +29,7 @@ class UserSeeder extends Seeder
         // ================= DOSEN =================
         $dosenUser = User::create([
             'name' => 'Dosen Pembimbing',
-            'email' => 'dosen@monitoring.com',
+            'email' => 'dosen@apps.ipb.ac.id',
             'password' => Hash::make('password'),
             'role_id' => $dosenRole->id,
         ]);
@@ -43,18 +44,24 @@ class UserSeeder extends Seeder
         // ================= MAHASISWA =================
         $mahasiswaUser = User::create([
             'name' => 'Mahasiswa TA',
-            'email' => 'mahasiswa@monitoring.com',
+            'email' => 'mahasiswa@apps.ipb.ac.id',
             'password' => Hash::make('password'),
             'role_id' => $mahasiswaRole->id,
         ]);
 
-        Mahasiswa::create([
+        $mahasiswa = Mahasiswa::create([
             'user_id' => $mahasiswaUser->id,
             'nim' => '2020123456',
             'prodi' => 'Informatika',
             'tahun_masuk' => 2020,
             'semester' => 8,
             'pembimbing_id' => $dosen->id, // relasi ke dosen
+        ]);
+
+        TugasAkhir::create([
+            'mahasiswa_id' => $mahasiswa->id,
+            'judul' => 'Sistem Monitoring Tugas Akhir Mahasiswa',
+            'status' => 'Proses',
         ]);
     }
 }

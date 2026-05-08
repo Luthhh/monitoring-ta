@@ -5,7 +5,6 @@
 @section('page-content')
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
 
@@ -16,9 +15,14 @@
     <div class="table-dosen">
         <div class="table-header">
             <h3>Tabel Dosen</h3>
-            <button class="btn-create" data-bs-toggle="modal" data-bs-target="#createDosenModal">
-                + Tambah Dosen
-            </button>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.dosen.export-excel') }}" class="btn-export-dosen">
+                    📊 Export Excel
+                </a>
+                <button class="btn-create" data-bs-toggle="modal" data-bs-target="#createDosenModal">
+                    + Tambah Dosen
+                </button>
+            </div>
         </div>
         @if(session('success'))
             <div class="alert alert-success">
@@ -32,7 +36,7 @@
                     <th>NIP</th>
                     <th>Nama</th>
                     <th>Prodi</th>
-                    <th>Aksi</th>
+                    <th>Detail</th>
                 </tr>
             </thead>
             <tbody>
@@ -57,8 +61,8 @@
                             </button>
 
                             <!-- DELETE -->
-                            <form action="{{ route('admin.dosen.destroy', $dosen->id) }}" method="POST" style="display:inline"
-                                onsubmit="return confirm('Yakin hapus dosen ini?')">
+                            <form action="{{ route('admin.dosen.destroy', $dosen->id) }}" method="POST" class="d-inline form-confirm"
+                                data-text="Yakin hapus dosen ini?">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-icon btn-delete">
@@ -115,7 +119,12 @@
 
                         <div class="mb-3">
                             <label>Password</label>
-                            <input type="password" name="password" class="form-control" required>
+                            <div class="input-group" style="display: flex;">
+                                <input type="password" name="password" class="form-control password-input" required style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                                <button class="btn btn-outline-secondary toggle-password" type="button" style="border: 1px solid #ced4da; border-left: none; border-radius: 0 10px 10px 0;">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                         </div>
 
                     </div>
@@ -135,6 +144,8 @@
             </div>
         </div>
     </div>
+
+    @foreach($dosens as $dosen)
     <!-- VIEW MODAL -->
     <div class="modal fade" id="viewModal{{ $dosen->id }}" tabindex="-1">
         <div class="modal-dialog">
@@ -175,7 +186,17 @@
 
                         <input type="text" name="name" value="{{ $dosen->user->name }}" class="form-control mb-2" required>
 
-                        <input type="text" name="prodi" value="{{ $dosen->prodi }}" class="form-control" required>
+                        <input type="text" name="prodi" value="{{ $dosen->prodi }}" class="form-control mb-3" required>
+
+                        <div class="mb-3">
+                            <label>Password Baru (Kosongkan Jika Tidak Diubah)</label>
+                            <div class="input-group" style="display: flex;">
+                                <input type="password" name="password" class="form-control password-input" style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                                <button class="btn btn-outline-secondary toggle-password" type="button" style="border: 1px solid #ced4da; border-left: none; border-radius: 0 10px 10px 0;">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
 
                     </div>
 
@@ -188,7 +209,7 @@
             </div>
         </div>
     </div>
-    </div>
+    @endforeach
 
 
 @endsection
@@ -356,6 +377,21 @@
             margin: 0;
         }
 
+.btn-export-dosen {
+    background: #fff8e1;
+    color: #f57f17;
+    border: 1px solid #ffe082;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-export-dosen:hover { background: #f57f17; color: white; }
         /* BUTTON CREATE */
         .btn-create {
             background: #02048d;
@@ -376,108 +412,45 @@
 @endpush
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            
+            const searchInput = document.getElementById("searchInput");
+            if (searchInput) {
+                searchInput.addEventListener("keyup", function() {
+                    let search = searchInput.value.toLowerCase();
+                    let rows = document.querySelectorAll("#tabelDosen tbody tr");
 
-            const dataPerTahun = {
-                2021: {
-                    belum: [30, 25, 20, 15, 10, 8, 5, 3, 2, 1, 0],
-                    sudah: [0, 5, 10, 15, 20, 22, 25, 27, 28, 29, 30]
-                },
-                2022: {
-                    belum: [40, 30, 25, 18, 12, 10, 6, 4, 3, 2, 1],
-                    sudah: [0, 10, 15, 22, 28, 30, 34, 36, 37, 38, 39]
-                },
-                2023: {
-                    belum: [50, 45, 35, 25, 15, 12, 8, 5, 3, 2, 1],
-                    sudah: [0, 5, 15, 25, 35, 38, 42, 45, 47, 48, 49]
-                }
-            };
+                    rows.forEach(row => {
+                        // Skip text message placeholder if nothing exists
+                        if(row.cells.length < 5) return;
 
-            const ctx1 = document.getElementById('barChart');
+                        let nama = row.cells[2].innerText.toLowerCase();
+                        
+                        let show = true;
+                        if (search && !nama.includes(search)) show = false;
 
-            let chart = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: [
-                        'Penetapan Komisi',
-                        'Sidang Komisi 1',
-                        'Kolokium',
-                        'Proposal',
-                        'Penelitian',
-                        'Evaluasi',
-                        'Sidang Komisi 2',
-                        'Seminar',
-                        'Publikasi',
-                        'Ujian Tesis',
-                        'SKL'
-                    ],
-                    datasets: [
-                        {
-                            label: 'Belum',
-                            data: dataPerTahun[2021].belum,
-                            backgroundColor: '#4e73df'
-                        },
-                        {
-                            label: 'Sudah',
-                            data: dataPerTahun[2021].sudah,
-                            backgroundColor: '#f6c23e'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: { stacked: true },
-                        y: { stacked: true }
-                    }
-                }
-            });
-
-            document.getElementById('filterTahun')
-                .addEventListener('change', function () {
-
-                    let tahun = this.value;
-
-                    chart.data.datasets[0].data = dataPerTahun[tahun].belum;
-                    chart.data.datasets[1].data = dataPerTahun[tahun].sudah;
-
-                    chart.update();
+                        row.style.display = show ? "" : "none";
+                    });
                 });
+            }
 
-            const ctx2 = document.getElementById('lineChart');
-
-            new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                    datasets: [{
-                        label: 'Bimbingan',
-                        data: [5, 18, 25, 6, 17, 26, 13, 7, 18, 6, 18, 25],
-                        backgroundColor: '#9b59b6'
-                    }]
-                }
+            // Toggle Password Visibility
+            document.querySelectorAll('.toggle-password').forEach(button => {
+                button.addEventListener('click', function() {
+                    const input = this.parentElement.querySelector('.password-input');
+                    const icon = this.querySelector('i');
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.replace('bi-eye', 'bi-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.replace('bi-eye-slash', 'bi-eye');
+                    }
+                });
             });
 
         });
-
-        function openModal(id) {
-            document.getElementById(id).style.display = "flex";
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = "none";
-        }
-
-        /* optional: klik luar modal untuk close */
-        window.addEventListener('click', function (e) {
-            const modal = document.getElementById('logModal');
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-
     </script>
 @endpush

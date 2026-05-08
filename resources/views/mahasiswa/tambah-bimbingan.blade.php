@@ -39,6 +39,27 @@ textarea {
 .btn-group-custom {
     text-align: right;
 }
+
+/* Pastikan input date bisa diklik */
+input[type="date"] {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    position: relative;
+    z-index: 1;
+    -webkit-appearance: auto !important;
+    appearance: auto !important;
+    padding-right: 10px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 1;
+    position: absolute;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    z-index: 2;
+}
 </style>
 
 
@@ -46,108 +67,100 @@ textarea {
 
     <h4 class="page-title">Tambah Bimbingan</h4>
 
-    <form>
+    <form action="{{ url('/mahasiswa/tambah-bimbingan') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
 
         {{-- Gambaran --}}
         <div class="card-form">
-            <h5>Gambaran Kegiatan</h5>
+            <h5>Detail Bimbingan</h5>
 
             <div class="mb-3">
-                <label class="form-label">Tahun Semester *</label>
-                <select class="form-select">
-                    <option>-- Pilih --</option>
-                    <option>2024/2025 Ganjil</option>
-                    <option>2024/2025 Genap</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Nama Kegiatan *</label>
-                <input type="text" class="form-control" placeholder="Judul kegiatan">
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Deskripsi Kegiatan *</label>
-                <textarea class="form-control" rows="4"></textarea>
+                <label class="form-label">Deskripsi Bimbingan *</label>
+                <textarea name="deskripsi" class="form-control" rows="4" required placeholder="Jelaskan topik yang akan dibahas..."></textarea>
             </div>
         </div>
-
 
         {{-- Waktu --}}
         <div class="card-form">
             <h5>Waktu dan Tempat</h5>
 
             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Tanggal Mulai *</label>
-                    <input type="date" class="form-control">
+                <div class="col-md-6 mb-3" style="position: relative; z-index: 5;">
+                    <label class="form-label">Tanggal *</label>
+                    <input type="date" name="tanggal" class="form-control" min="{{ date('Y-m-d') }}" required>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Tanggal Selesai *</label>
-                    <input type="date" class="form-control">
+                <div class="col-md-6 mb-3" style="position: relative; z-index: 5;">
+                    <label class="form-label">Waktu *</label>
+                    <input type="time" name="waktu" class="form-control" required>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Durasi Jam *</label>
-                <input type="number" class="form-control">
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Tipe Penyelenggaraan *</label>
-                <select class="form-select">
-                    <option>Hybrid</option>
-                    <option>Online</option>
-                    <option>Offline</option>
-                </select>
+                <label class="form-label">Tempat *</label>
+                <input type="text" name="tempat" class="form-control" placeholder="Contoh: Lab, Zoom, Ruang Dosen" required>
             </div>
         </div>
-
 
         {{-- Pembimbing --}}
         <div class="card-form">
             <h5>Pembimbing Kegiatan</h5>
 
+            @if($mahasiswa->pembimbing1 || $mahasiswa->pembimbing2)
+                <div class="alert alert-info py-2 mb-3" style="font-size:13px;">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    Dosen yang ditampilkan adalah dosen pembimbing Anda yang sudah dipilih.
+                </div>
+            @else
+                <div class="alert alert-warning py-2 mb-3" style="font-size:13px;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    Anda belum memilih dosen pembimbing. Silakan
+                    <a href="{{ route('mahasiswa.profile') }}">pilih dosen pembimbing</a> terlebih dahulu,
+                    atau pilih dari semua dosen di bawah.
+                </div>
+            @endif
+
             <div class="mb-3">
-                <label class="form-label">Pembimbing IPB *</label>
-                <select class="form-select">
-                    <option>-- Pilih Dosen --</option>
-                    <option>Dr. Lina</option>
-                    <option>Dr. Andi</option>
+                <label class="form-label">Pilih Dosen Pembimbing *</label>
+                <select name="dosen_id" class="form-select" required>
+                    <option value="">-- Pilih Dosen --</option>
+                    @foreach($dosens as $dosen)
+                        <option value="{{ $dosen->id }}" {{ old('dosen_id') == $dosen->id ? 'selected' : '' }}>
+                            {{ $dosen->user->name ?? '-' }}{{ $dosen->nip ? ' (' . $dosen->nip . ')' : '' }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
         </div>
 
 
-        {{-- Dokumen --}}
-        <div class="card-form">
-            <h5>Dokumen Pendukung</h5>
-
-            <div class="mb-3">
-                <label class="form-label">Nama *</label>
-                <input type="text" class="form-control" placeholder="Sertifikat, LOA, dll">
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">File *</label>
-                <input type="file" class="form-control">
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Link *</label>
-                <input type="text" class="form-control" placeholder="URL kegiatan">
-            </div>
-
-            <small class="text-muted">Maksimum upload 10MB</small>
-        </div>
-
-
         <div class="btn-group-custom">
-            <a href="/mahasiswa/dashboard" class="btn btn-secondary">
+            <a href="{{ url('/mahasiswa/dashboard') }}" class="btn btn-secondary text-white">
                 Batal
             </a>
-            <button type="submit" class="btn btn-primary">Simpan</button>
+            <button type="submit" class="btn btn-primary">Ajukan Bimbingan</button>
         </div>
 
     </form>

@@ -19,6 +19,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Pagination\Paginator::useBootstrapFive();
+
+        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+            if (\Illuminate\Support\Facades\Schema::hasTable('mahasiswas')) {
+                $tahuns = \App\Models\Mahasiswa::select('tahun_masuk')
+                    ->distinct()
+                    ->orderBy('tahun_masuk', 'desc')
+                    ->pluck('tahun_masuk');
+                $view->with('all_years', $tahuns);
+            }
+        });
     }
 }

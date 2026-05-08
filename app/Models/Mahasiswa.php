@@ -15,6 +15,10 @@ class Mahasiswa extends Model
         'tahun_masuk',
         'semester',
         'pembimbing_id',
+        'pembimbing1_id',
+        'pembimbing2_id',
+        'sk_pembimbing',
+        'foto',
     ];
 
     // Relasi ke User (akun login)
@@ -36,5 +40,11 @@ class Mahasiswa extends Model
     public function pembimbing2()
     {
         return $this->belongsTo(Dosen::class, 'pembimbing2_id');
+    }
+
+    public function getAngkatanFormattedAttribute()
+    {
+        if (!$this->tahun_masuk) return '-';
+        return $this->tahun_masuk;
     }
 }

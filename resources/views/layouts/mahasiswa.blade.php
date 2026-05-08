@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="d-flex">
+<div class="d-flex" style="height: 100vh;">
 
     @include('components.sidebar-mahasiswa')
 

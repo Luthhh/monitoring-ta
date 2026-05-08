@@ -1,18 +1,23 @@
 @extends('layouts.admin')
 
-@section('title','Detail Aktivitas Bimbingan')
+@section('title','Aktivitas Bimbingan')
 
 @section('page-content')
 
-
 <div class="page-wrapper">
-    <h2 class="page-title">Detail Aktivitas Bimbingan</h2>
+    <h2 class="page-title">Detail Mahasiswa Kritis</h2>
 
-    {{--  Mahasiswa > 30 hari --}}
+    @if(session('success'))
+        <div class="alert alert-success mb-3" style="background:#e6f7ee; color:#1a7f4b; border:1px solid #b7e4c7; border-radius:10px; padding:12px 18px; font-size:14px;">
+            ✅ {{ session('success') }}
+        </div>
+    @endif
+
+    {{-- Mahasiswa > 30 hari tidak bimbingan --}}
     <div class="card-box">
         <div class="card-header">
-            <span>🔔 Mahasiswa Tidak Bimbingan > 30 Hari</span>
-            <span class="badge-danger">2</span>
+            <span>🔔 Mahasiswa Tidak Bimbingan &gt; 30 Hari</span>
+            <span class="badge-danger">{{ $tidakBimbingan30->count() }}</span>
         </div>
 
         <table class="table-custom">
@@ -23,37 +28,61 @@
                     <th>Terakhir Bimbingan</th>
                     <th>Milestone</th>
                     <th>Target Milestone</th>
-                    <th>Status</th>
+                    <th>Status TA</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
+                @forelse($tidakBimbingan30 as $mhs)
+                @php
+                    $tglTerakhir = $mhs->last_bimbingan ? \Carbon\Carbon::parse($mhs->last_bimbingan->tanggal)->format('d M Y') : 'Belum Pernah';
+                    $milestoneActive = $mhs->active_milestone ? $mhs->active_milestone->jenis_milestone : '-';
+                    $targetDate = ($mhs->active_milestone && $mhs->active_milestone->deadline) ? \Carbon\Carbon::parse($mhs->active_milestone->deadline)->format('d M Y') : 'Belum Atur';
+                @endphp
                 <tr>
-                    <td>2021001</td>
-                    <td>Andi Saputra</td>
-                    <td>12 Des 2025</td>
-                    <td>Kolokium</td>
-                    <td>20 Feb 2025</td>
-                    <td><span class="status-badge done">Sudah</span></td>
+                    <td>{{ $mhs->nim }}</td>
+                    <td>{{ $mhs->user->name ?? '-' }}</td>
                     <td>
-                        <button class="btn-remind">Ingatkan</button>
+                        {{ $tglTerakhir }}
+                        @if($mhs->last_bimbingan)
+                            <div style="font-size:11px; color:#e74a3b; margin-top:2px;">{{ (int) now()->diffInDays(\Carbon\Carbon::parse($mhs->last_bimbingan->tanggal)) }} hari lalu</div>
+                        @else
+                            <div style="font-size:11px; color:#e74a3b; margin-top:2px;">Sejak awal</div>
+                        @endif
+                    </td>
+                    <td>{{ $milestoneActive }}</td>
+                    <td>{{ $targetDate }}</td>
+                    <td>
+                        <span class="status-badge {{ $mhs->status_ta ?? 'behind' }}">
+                            {{ ucfirst($mhs->status_ta ?? 'behind') }}
+                        </span>
+                    </td>
+                    <td onclick="event.stopPropagation();">
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('admin.detail-mahasiswa', $mhs->id) }}" class="btn-detail-sm" title="Lihat Detail">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <form action="{{ route('admin.kirim_pengingat', $mhs->id) }}" method="POST" class="d-inline form-confirm" data-text="Kirim notifikasi pengingat ke mahasiswa ini?">
+                                @csrf
+                                <button type="submit" class="btn-remind-sm">
+                                    <i class="fas fa-bell"></i>
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
+                @empty
                 <tr>
-                    <td>2021003</td>
-                    <td>Rina Putri</td>
-                    <td>1 Des 2025</td>
-                    <td>Seminar</td>
-                    <td>20 Feb 2025</td>
-                    <td><span class="status-badge pending">Belum</span></td>
-                    <td>
-                    <button class="btn-remind">Ingatkan</button>
+                    <td colspan="8" class="text-center" style="font-weight: 500; padding:20px; text-align:center;">
+                        🎉 Semua mahasiswa aktif melakukan bimbingan dalam 30 hari terakhir.
                     </td>
                 </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 </div>
+
 @endsection
 
 @push('styles')
@@ -98,14 +127,6 @@
     font-weight: 600;
 }
 
-.badge-success {
-    background: #e6f4ea;
-    color: #1cc88a;
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-weight: 600;
-}
-
 /* TABLE */
 .table-custom {
     width: 100%;
@@ -124,24 +145,12 @@
     padding: 10px;
     border-top: 1px solid #eee;
     font-size: 14px;
+    word-break: break-word;
 }
 
-/* STATUS */
-.status {
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 500;
-}
 
-.status.warning {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.status.success {
-    background: #d1f2eb;
-    color: #0c6b58;
+table tbody tr:hover td {
+    background-color: #f8f9fc;
 }
 
 /* badge status */
@@ -151,200 +160,40 @@
     font-size: 13px;
     font-weight: 600;
     display: inline-block;
+    text-align: center;
 }
 
-/* sudah = hijau */
-.status-badge.done {
-    background: #e6f7ee;
-    color: #1cc88a;
-}
+.status-badge.ahead  { background: #e6f7ee; color: #1cc88a; }
+.status-badge.ideal  { background: #fff4e5; color: #f6a500; }
+.status-badge.behind { background: #ffe5e5; color: #e74a3b; }
 
-/* belum = merah */
-.status-badge.pending {
-    background: #fde8e8;
-    color: #e74a3b;
-}
-
-/* tombol ingatkan */
-.btn-remind {
-    border: none;
-    background: #ff0000;
+.btn-detail-sm {
+    background: #0dcaf0;
     color: white;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-}
-
-.btn-remind:hover {
-    background: #ffd500;
-}
-
-.btn-view-log {
-    border: none;
     padding: 6px 14px;
     border-radius: 8px;
-    background: #36b9cc;
-    color: white;
     font-size: 13px;
-    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
     transition: 0.2s;
 }
+.btn-detail-sm:hover { background: #0ab4d8; color: white; }
 
-.btn-view-log:hover {
-    background: #2c9faf;
-}
-
-.modal-log {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(4px);
-    z-index: 999;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.modal-content-log {
-    background: white;
-    width: 540px;
-    max-width: 100%;
-    border-radius: 20px;
-    padding: 24px;
-    animation: fadeIn .25s ease;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-    border: 1px solid #eef2f7;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 18px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.modal-header h4 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1f2937;
-}
-
-.close-modal {
-    cursor: pointer;
-    font-size: 18px;
-}
-
-.log-grid {
-    display: grid;
-    grid-template-columns: 180px 10px 1fr;
-    gap: 12px 14px;
-    font-size: 14px;
-    align-items: start;
-}
-
-.colon {
-    text-align: center;
-    color: #6b7280;
-    font-weight: 600;
-}
-
-.modal-actions {
-    text-align: right;
-    margin-top: 20px;
-}
-
-@keyframes fadeIn {
-    from {transform: scale(0.95); opacity: 0;}
-    to {transform: scale(1); opacity: 1;}
-}
-.modal-footer-log {
-    text-align: right;
-    margin-top: 20px;
-}
-
-.btn-close-log {
-    background: #858796;
-    color: white;
+/* tombol ingatkan */
+.btn-remind-sm {
     border: none;
-    padding: 8px 18px;
+    background: #e74a3b;
+    color: white;
+    padding: 6px 14px;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+    display: inline-block;
 }
-
-.table-custom {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed; /* ⭐⭐⭐ INI KUNCI UTAMA */
+.btn-remind-sm:hover {
+    background: #be2e21;
 }
-
-.table-custom th,
-.table-custom td {
-    padding: 10px;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    white-space: normal; /* ⭐ penting */
-    vertical-align: top;
-}
-
-/* ====== LOCK COLUMN WIDTH ====== */
-
-.table-custom th:nth-child(1),
-.table-custom td:nth-child(1) {
-    width: 110px; /* NIM */
-}
-
-.table-custom th:nth-child(2),
-.table-custom td:nth-child(2) {
-    width: 200px; /* Nama */
-}
-
-.table-custom th:nth-child(3),
-.table-custom td:nth-child(3) {
-    width: 150px; /* Terakhir */
-}
-
-.table-custom th:nth-child(4),
-.table-custom td:nth-child(4) {
-    width: 160px; /* Milestone */
-}
-
-.table-custom th:nth-child(5),
-.table-custom td:nth-child(5) {
-    width: 150px; /* Target */
-}
-
-.table-custom th:nth-child(6),
-.table-custom td:nth-child(6) {
-    width: 120px; /* Status */
-}
-
-.table-custom th:nth-child(7),
-.table-custom td:nth-child(7) {
-    width: 130px; /* Aksi */
-}
-
 
 </style>
 @endpush
-
-<script>
-function openLogModal() {
-    document.getElementById('logModal').style.display = 'flex';
-}
-
-function closeLogModal() {
-    document.getElementById('logModal').style.display = 'none';
-}
-
-/* optional: klik luar modal untuk close */
-window.addEventListener('click', function(e) {
-    const modal = document.getElementById('logModal');
-    if (e.target === modal) {
-        modal.style.display = 'none';
-    }
-});
-</script>

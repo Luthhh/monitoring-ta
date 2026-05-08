@@ -1,0 +1,123 @@
+/* Shared table styles used by ahead, ideal, and behind pages */
+
+.btn-back { 
+    background:#e7f1ff; 
+    color:#4e73df; 
+    border:1px solid #d0e2ff; 
+    padding:8px 16px; 
+    border-radius:8px; 
+    font-size:13px; 
+    font-weight:600; 
+    text-decoration:none; 
+    display:inline-flex; 
+    align-items:center; 
+    gap:6px; 
+}
+
+.btn-back:hover { 
+    background:#4e73df; 
+    color:white; 
+}
+
+.stat-card { 
+    color:white; 
+    padding:25px; 
+    border-radius:12px; 
+    margin-bottom:25px; 
+    box-shadow:0 5px 15px rgba(0,0,0,0.08); 
+}
+
+.stat-card h2 { 
+    font-size:32px; 
+    font-weight:700; 
+    margin: 0;
+}
+
+.stat-green  { background:#00a806; }
+.stat-yellow { background:#f6a500; }
+.stat-red    { background:#e74a3b; }
+
+.card { 
+    background:white; 
+    padding:25px; 
+    border-radius:12px; 
+    box-shadow:0 5px 15px rgba(0,0,0,0.05); 
+}
+
+table { 
+    width:100%; 
+    border-collapse:collapse; 
+    margin-top:10px; 
+}
+
+table th, table td { 
+    padding:12px 14px; 
+    text-align:center; 
+    font-size:14px; 
+    vertical-align:middle; 
+}
+
+table thead { 
+    background:#f1f2f6; 
+}
+
+table tbody tr { 
+    border-bottom:1px solid #eee; 
+}
+
+table tbody tr:hover { 
+    background:#f8fafc; 
+}
+
+td { 
+    word-break:break-word; 
+}
+
+.role-badge { 
+    font-size:11px; 
+    padding:2px 6px; 
+    border-radius:6px; 
+    font-weight:600; 
+    display:inline-block; 
+}
+
+.role-badge.p1 { background:#e8f0ff; color:#3b4cca; }
+.role-badge.p2 { background:#e6f4ea; color:#1cc88a; }
+
+.badge-ms { 
+    background:#02048d; 
+    color:white; 
+    padding:4px 10px; 
+    border-radius:20px; 
+    font-size:12px; 
+    display:inline-block; 
+}
+
+.danger-badge { 
+    background:#ffe5e5; 
+    color:#e74a3b; 
+    padding:3px 8px; 
+    border-radius:12px; 
+    font-size:11px; 
+    font-weight:600; 
+    display:inline-block; 
+    margin-left:4px; 
+}
+
+.btn-icon { 
+    border:none; 
+    width:34px; 
+    height:34px; 
+    border-radius:8px; 
+    cursor:pointer; 
+    color:white; 
+    display:inline-flex; 
+    align-items:center; 
+    justify-content:center; 
+    font-size:14px; 
+    transition:0.2s; 
+    text-decoration:none; 
+}
+
+.btn-view { background:#0dcaf0; }
+.btn-icon:hover { transform:scale(1.05); opacity:0.9; }

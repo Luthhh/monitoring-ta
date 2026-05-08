@@ -8,75 +8,40 @@
 
     <h4 class="page-title">Semua Notifikasi</h4>
 
-    <div class="date-title">4 Januari 2025</div>
-    <div class="notif-item">
-        <div class="notif-text">Pembimbing telah memverifikasi milestone</div>
-        <div class="notif-time">02.00</div>
-    </div>
+    @if($notifications->isEmpty())
+        <div class="empty-state">
+            <i class="bi bi-bell-slash fs-1 text-muted d-block mb-3"></i>
+            <p class="text-muted">Belum ada notifikasi.</p>
+        </div>
+    @else
+        @foreach($notifications as $date => $items)
+            <div class="date-title">{{ $date }}</div>
 
-    <div class="date-title">3 Januari 2025</div>
-    <div class="notif-item">
-        <div class="notif-text">Milestone berhasil diunggah</div>
-        <div class="notif-time">04.10</div>
-    </div>
-
-    <div class="date-title">2 Januari 2025</div>
-    <div class="notif-item">
-        <div class="notif-text">Pembimbing menyetujui pengajuan bimbingan</div>
-        <div class="notif-time">01.45</div>
-    </div>
-
-    <div class="date-title">1 Januari 2025</div>
-    <div class="notif-item">
-        <div class="notif-text">Bimbingan telah berhasil diajukan</div>
-        <div class="notif-time">04.36</div>
-    </div>
+            @foreach($items as $notif)
+                <div class="notif-item {{ $notif->is_read ? '' : 'unread' }}">
+                    <div class="notif-left">
+                        <div class="notif-icon">
+                            <i class="bi bi-bell-fill"></i>
+                        </div>
+                        <div>
+                            @if($notif->title)
+                                <div class="notif-title">{{ $notif->title }}</div>
+                            @endif
+                            <div class="notif-text">{{ $notif->message }}</div>
+                        </div>
+                    </div>
+                    <div class="notif-time">
+                        {{ \Carbon\Carbon::parse($notif->created_at)->setTimezone('Asia/Jakarta')->format('H:i') }}
+                    </div>
+                </div>
+            @endforeach
+        @endforeach
+    @endif
 
 </div>
 
 @endsection
 
 @push('styles')
-<style>
-.page-title {
-    margin-bottom: 30px;
-    font-weight: 600;
-}
-
-.date-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-top: 25px;
-    margin-bottom: 10px;
-    color: #444;
-}
-
-.notif-item {
-    background: #f1f3f7;
-    padding: 18px 25px;
-    border-radius: 10px;
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.notif-text {
-    font-size: 14px;
-    color: #333;
-}
-
-.notif-time {
-    font-size: 13px;
-    color: #666;
-}
-
-@media(max-width: 768px){
-    .notif-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-}
-</style>
+    <link rel="stylesheet" href="{{ asset('css/dosen/d-notifikasi.css') }}">
 @endpush

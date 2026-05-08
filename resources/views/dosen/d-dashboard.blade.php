@@ -10,87 +10,165 @@
     <div class="topbar">
         <h2>Monitoring Tugas Akhir</h2>
         <div class="topbar-right">
-            <a href="/dosen/notifikasi" class="notif-icon">
-                <i class="fas fa-bell"></i>
-            </a>
-            <img src="https://i.pravatar.cc/100" alt="">
-            <span>Dini S.Kom M.Kom</span>
+            <span>{{ $user->name }}</span>
         </div>
     </div>
 
     <div class="cards">
         <a href="{{ url('/dosen/total-mahasiswa') }}" class="card blue text-decoration-none">
-            <h2>2</h2>
+            <h2>{{ $totalMahasiswa }}</h2>
             <p>Mahasiswa Aktif</p>
         </a>
         <a href="{{ url('/dosen/ahead-mahasiswa') }}" class="card green text-decoration-none">
-            <h2>2</h2>
+            <h2>{{ $ahead }}</h2>
             <p>Ahead</p>
         </a>
         <a href="{{ url('/dosen/ideal-mahasiswa') }}" class="card yellow text-decoration-none">
-            <h2>0</h2>
+            <h2>{{ $ideal }}</h2>
             <p>Ideal</p>
         </a>
         <a href="{{ url('/dosen/behind-mahasiswa') }}" class="card red text-decoration-none">
-            <h2>0</h2>
+            <h2>{{ $behind }}</h2>
             <p>Behind</p>
         </a>
     </div>
 
+    {{-- Ringkasan Bimbingan Bulanan --}}
+    <h3 style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">📅 Ringkasan Bimbingan Bulanan</h3>
+    <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-bottom: 30px;">
+        <div class="card" style="background: white; border: 1px solid #e2e8f0; color: #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Rencana Bimbingan (Bulan Ini)</span>
+            <span style="font-size: 26px; font-weight: 800; color: #4e73df;">{{ $rencanaBimbinganBulanIni }}</span>
+        </div>
+        <div class="card" style="background: white; border: 1px solid #e2e8f0; color: #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Bimbingan Terlaksana (Bulan Ini)</span>
+            <span style="font-size: 26px; font-weight: 800; color: #1cc88a;">{{ $terlaksanaBulanIni }}</span>
+        </div>
+        <div class="card" style="background: white; border: 1px solid #e2e8f0; color: #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Jumlah Bimbingan Aktif</span>
+            <span style="font-size: 26px; font-weight: 800; color: #f6c23e;">{{ $jumlahBimbinganAktif }}</span>
+        </div>
+    </div>
+
+    {{-- TABLE PENGAJUAN BIMBINGAN (DI ATAS) --}}
+    <div class="card-box" style="margin-bottom: 30px;">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 18px; font-weight: 600;">📥 Pengajuan Bimbingan Menunggu</h3>
+            <span class="badge bg-primary">{{ $pengajuanBimbingans->count() }}</span>
+        </div>
+
+        <table class="table-custom" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <thead style="background: #f8f9fc;">
+                <tr>
+                    <th style="padding: 12px; font-size: 13px; color: #6c757d; font-weight: 600;">NIM</th>
+                    <th style="padding: 12px; font-size: 13px; color: #6c757d; font-weight: 600;">Nama</th>
+                    <th style="padding: 12px; font-size: 13px; color: #6c757d; font-weight: 600;">Jadwal Bimbingan Aktual</th>
+                    <th style="padding: 12px; font-size: 13px; color: #6c757d; font-weight: 600;">Deskripsi</th>
+                    <th style="padding: 12px; font-size: 13px; color: #6c757d; font-weight: 600;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($pengajuanBimbingans as $bimbingan)
+                @php
+                    $mahasiswa = optional($bimbingan->tugasAkhir)->mahasiswa;
+                    $user_mhs  = optional($mahasiswa)->user;
+                @endphp
+                <tr>
+                    <td style="padding: 12px; border-top: 1px solid #eee; text-align: center;">{{ optional($mahasiswa)->nim ?? '-' }}</td>
+                    <td style="padding: 12px; border-top: 1px solid #eee;">{{ optional($user_mhs)->name ?? '-' }}</td>
+                    <td style="padding: 12px; border-top: 1px solid #eee; text-align: center;">{{ \Carbon\Carbon::parse($bimbingan->tanggal)->format('d M Y') }}{{ $bimbingan->waktu ? ' (' . \Carbon\Carbon::parse($bimbingan->waktu)->format('H:i') . ')' : '' }}</td>
+                    <td style="padding: 12px; border-top: 1px solid #eee;">{{ Str::limit($bimbingan->deskripsi ?? $bimbingan->catatan, 50) }}</td>
+                    <td style="padding: 12px; border-top: 1px solid #eee; text-align: center;">
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-view" title="Detail" onclick="openPengajuanModal('{{ optional($mahasiswa)->nim }}', '{{ addslashes(optional($user_mhs)->name) }}', '{{ \Carbon\Carbon::parse($bimbingan->created_at)->format('d M Y') }}', '{{ \Carbon\Carbon::parse($bimbingan->tanggal)->format('d M Y') }}', '{{ $bimbingan->waktu }} - {{ $bimbingan->tempat }}', '{{ addslashes($bimbingan->deskripsi) }}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn-icon btn-approve" title="Setujui" onclick="openApproveModal('bimbingan', {{ $bimbingan->id }})"><i class="fas fa-check"></i></button>
+                            <button class="btn-icon btn-reject" title="Tolak" onclick="openRejectModal('bimbingan', {{ $bimbingan->id }})"><i class="fas fa-times"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="5" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada pengajuan bimbingan baru.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
     <div class="highlight-bar">
-        <a href="{{ url('/dosen/aktivitas-bimbingan') }}" class="highlight-item warning clickable-card">
+        <a href="{{ route('dosen.aktivitas_bimbingan') }}" class="highlight-item warning clickable-card">
             <div class="highlight-text">
                 🔔 Mahasiswa tidak bimbingan &gt; 30 hari
             </div>
-            <div class="highlight-number">2</div>
+            <div class="highlight-number warning-num">{{ $tidakBimbingan30 }}</div>
         </a>
-        <a href="{{ url('/dosen/aktivitas-bimbingan') }}" class="highlight-item warning clickable-card">
+        <a href="{{ route('dosen.aktivitas_bimbingan') }}" class="highlight-item info clickable-card">
             <div class="highlight-text">
                 📅 Bimbingan bulan ini
             </div>
-            <div class="highlight-number">3</div>
+            <div class="highlight-number info-num">{{ $bimbinganBulanIni }}</div>
         </a>
     </div>
 
     <div class="box">
         <div class="box-header">
-        <h3>Sebaran Mahasiswa</h3>
-
-        <select id="filterTahun">
-            <option value="2021">Angkatan 2021</option>
-            <option value="2022">Angkatan 2022</option>
-            <option value="2023">Angkatan 2023</option>
-        </select>
+            <h3>📈 Sebaran Milestone Mahasiswa</h3>
+            <select id="filterTahun">
+                <option value="all">Semua Angkatan</option>
+                @foreach($all_years as $tahun)
+                    <option value="{{ $tahun }}">{{ $tahun }}</option>
+                @endforeach
+            </select>
         </div>
-
-        <canvas id="barChart"></canvas>
-    </div>
-
-</div>
-
-<div class="page-wrapper">
-    <h2 class="page-title">Pengajuan & Verifikasi Bimbingan</h2>
-
-    <!-- CARD SUMMARY -->
-    <div class="summary-wrapper">
-        <div class="summary-card">
-            <div class="summary-text">
-                📝 Pengajuan Menunggu
-            </div>
-            <div class="summary-number">5</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-text">
-                📄 Bukti Menunggu Verifikasi
-            </div>
-            <div class="summary-number">3</div>
+        <div class="chart-container">
+            <canvas id="barChart"></canvas>
         </div>
     </div>
 
-    {{-- TABLE PENGAJUAN BIMBINGAN --}}
-    <div class="card-box">
+    <div class="box" style="margin-top: 30px;">
+        <div class="box-header">
+            <h3>📉 Grafik Ringkasan Bimbingan (6 Bulan Terakhir)</h3>
+        </div>
+        <div class="chart-container">
+            <canvas id="bimbinganChart"></canvas>
+        </div>
+    </div>
+
+
+
+    {{-- CARD SUMMARY --}}
+    <h3 style="margin-top: 35px; margin-bottom: 15px; font-size: 18px; font-weight: 600;">📋 Menunggu Tinjauan Anda</h3>
+    <div class="highlight-bar">
+        <a href="#tabel-verifikasi-milestone" class="highlight-item clickable-card" style="border-left: 4px solid #4e73df;">
+            <div class="highlight-text" style="display: flex; align-items: center; gap: 12px;">
+                <div style="background: #eef2ff; color: #4e73df; width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div>
+                    <span style="font-size: 12px; color: #64748b; font-weight: 600; display: block;">Menunggu Verifikasi</span>
+                    <span style="font-size: 15px; color: #1e293b; font-weight: 700;">Bukti Milestone</span>
+                </div>
+            </div>
+            <div class="highlight-number" style="font-size: 20px; width: 48px; height: 48px; background: #eef2ff; color: #4e73df;">{{ $verifikasiMilestones->count() }}</div>
+        </a>
+        <a href="#tabel-verifikasi-bimbingan" class="highlight-item clickable-card" style="border-left: 4px solid #1cc88a;">
+            <div class="highlight-text" style="display: flex; align-items: center; gap: 12px;">
+                <div style="background: #e6f7ee; color: #1cc88a; width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div>
+                    <span style="font-size: 12px; color: #64748b; font-weight: 600; display: block;">Menunggu Verifikasi</span>
+                    <span style="font-size: 15px; color: #1e293b; font-weight: 700;">Bukti Bimbingan</span>
+                </div>
+            </div>
+            <div class="highlight-number" style="font-size: 20px; width: 48px; height: 48px; background: #e6f7ee; color: #1cc88a;">{{ $verifikasiBimbingans->count() }}</div>
+        </a>
+    </div>
+
+    {{-- Tables for Verification --}}
+
+    {{-- TABLE VERIFIKASI BUKTI MILESTONE --}}
+    <div class="card-box" id="tabel-verifikasi-milestone">
         <div class="card-header">
-            <span>Pengajuan Bimbingan</span>
+            <span>Verifikasi Bukti Milestone</span>
         </div>
 
         <table class="table-custom">
@@ -98,145 +176,78 @@
                 <tr>
                     <th>NIM</th>
                     <th>Nama</th>
-                    <th>Tgl Pengajuan</th>
-                    <th>Rencana Bimbingan</th>
-                    <th>Topik</th>
+                    <th>Tgl Upload</th>
+                    <th>Jenis Milestone</th>
+                    <th>Bukti</th>
                     <th>Status</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
+                @forelse($verifikasiMilestones as $milestone)
+                @php
+                    $mahasiswa = optional($milestone->tugasAkhir)->mahasiswa;
+                    $user_mhs  = optional($mahasiswa)->user;
+                @endphp
                 <tr>
-                    <td>J0403221149</td>
+                    <td>{{ optional($mahasiswa)->nim ?? '-' }}</td>
+                    <td>{{ optional($user_mhs)->name ?? '-' }}</td>
+                    <td>{{ $milestone->tanggal_upload ? \Carbon\Carbon::parse($milestone->tanggal_upload)->format('d M Y') : '-' }}</td>
+                    <td>{{ $milestone->jenis_milestone }}</td>
                     <td>
-                        <span class="role-badge p1">P1</span>
-                        Andi Saputra
+                        @if(is_array($milestone->file_path))
+                            @foreach($milestone->file_path as $key => $path)
+                                <a href="{{ asset('storage/'.$path) }}" target="_blank" class="badge bg-secondary text-decoration-none d-block mb-1">
+                                    📄 {{ is_numeric($key) ? 'Bukti ' . ($key + 1) : ucfirst(str_replace('_', ' ', $key)) }}
+                                </a>
+                            @endforeach
+                        @elseif($milestone->file_path)
+                            <a href="{{ asset('storage/'.$milestone->file_path) }}" target="_blank" class="btn-proof">
+                                📄 Lihat Bukti
+                            </a>
+                        @else
+                            <span style="color:#aaa">-</span>
+                        @endif
                     </td>
-                    <td>5 Feb 2026</td>
-                    <td>10 Feb 2026</td>
-                    <td>Revisi Bimbingan</td>
-                    <td><span class="status-badge waiting">Menunggu</span></td>
+                    <td><span class="status-badge verify">Menunggu</span></td>
                     <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view" onclick="openModal('pengajuanModal')">
+                        {{-- Lihat --}}
+                        <button class="btn-icon btn-view"
+                            onclick="openVerifikasiModal(
+                                '{{ optional($mahasiswa)->nim ?? '-' }}',
+                                '{{ addslashes(optional($user_mhs)->name ?? '-') }}',
+                                '{{ $milestone->jenis_milestone }}',
+                                '{{ $milestone->tanggal_upload ? \Carbon\Carbon::parse($milestone->tanggal_upload)->format('d M Y') : '-' }}',
+                                {{ json_encode($milestone->file_path) }},
+                                '{{ addslashes($milestone->catatan_revisi ?? '-') }}'
+                            )">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <!-- Setujui -->
-                        <button class="btn-icon btn-approve" onclick="openModal('approveModal')">
+                        {{-- Setujui --}}
+                        <button class="btn-icon btn-approve"
+                            onclick="openApproveModal('milestone', {{ $milestone->id }})">
                             <i class="fas fa-check"></i>
                         </button>
-                        <!-- Tolak -->
-                        <button class="btn-icon btn-reject" onclick="openModal('rejectModal')">
+                        {{-- Tolak --}}
+                        <button class="btn-icon btn-reject"
+                            onclick="openRejectModal('milestone', {{ $milestone->id }})">
                             <i class="fas fa-times"></i>
                         </button>
                     </td>
                 </tr>
+                @empty
                 <tr>
-                    <td>J0403221150</td>
-                    <td>
-                        <span class="role-badge p2">P2</span>
-                        Anindya
-                    </td>
-                    <td>10 Feb 2026</td>
-                    <td>13 Maret 2026</td>
-                    <td>Pengajuan Judul</td>
-                    <td><span class="status-badge waiting">Menunggu</span></td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view" onclick="openModal('pengajuanModal')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <!-- Setujui -->
-                        <button class="btn-icon btn-approve" onclick="openModal('approveModal')">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <!-- Tolak -->
-                        <button class="btn-icon btn-reject" onclick="openModal('rejectModal')">
-                            <i class="fas fa-times"></i>
-                        </button>
+                    <td colspan="7" style="text-align:center; color:#aaa; padding:20px;">
+                        Tidak ada bukti milestone yang menunggu verifikasi.
                     </td>
                 </tr>
-                <tr>
-                    <td>J0403221151</td>
-                    <td>
-                        <span class="role-badge p2">P2</span>
-                        Yasmin
-                    </td>
-                    <td>14 Feb 2026</td>
-                    <td>2 April 2026</td>
-                    <td>Revisi Bimbingan</td>
-                    <td><span class="status-badge waiting">Menunggu</span></td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view" onclick="openModal('pengajuanModal')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <!-- Setujui -->
-                        <button class="btn-icon btn-approve" onclick="openModal('approveModal')">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <!-- Tolak -->
-                        <button class="btn-icon btn-reject" onclick="openModal('rejectModal')">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>J0403221152</td>
-                    <td>
-                        <span class="role-badge p1">P1</span>
-                        Rahdi
-                    </td>
-                    <td>14 Feb 2026</td>
-                    <td>2 April 2026</td>
-                    <td>Revisi Bimbingan</td>
-                    <td><span class="status-badge waiting">Menunggu</span></td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view" onclick="openModal('pengajuanModal')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <!-- Setujui -->
-                        <button class="btn-icon btn-approve" onclick="openModal('approveModal')">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <!-- Tolak -->
-                        <button class="btn-icon btn-reject" onclick="openModal('rejectModal')">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>J0403221153</td>
-                    <td>
-                        <span class="role-badge p1">P1</span>
-                        Dinda
-                    </td>
-                    <td>14 Feb 2026</td>
-                    <td>2 April 2026</td>
-                    <td>Revisi Bimbingan</td>
-                    <td><span class="status-badge waiting">Menunggu</span></td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view" onclick="openModal('pengajuanModal')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <!-- Setujui -->
-                        <button class="btn-icon btn-approve" onclick="openModal('approveModal')">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <!-- Tolak -->
-                        <button class="btn-icon btn-reject" onclick="openModal('rejectModal')">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </td>
-                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
-    {{-- TABLE SRUJUI BUKTI BIMBINGAN--}}
-    <div class="card-box">
+    {{-- TABLE VERIFIKASI BUKTI BIMBINGAN --}}
+    <div class="card-box mt-4" id="tabel-verifikasi-bimbingan">
         <div class="card-header">
             <span>Verifikasi Bukti Bimbingan</span>
         </div>
@@ -246,196 +257,195 @@
                 <tr>
                     <th>NIM</th>
                     <th>Nama</th>
-                    <th>Tgl Bimbingan</th>
-                    <th>Topik</th>
-                    <th>Milestone</th>
+                    <th>Jadwal Bimbingan</th>
+                    <th>Catatan Mahasiswa</th>
+                    <th>Berkas Bukti</th>
                     <th>Status</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
+                @forelse($verifikasiBimbingans as $vb)
+                @php
+                    $mahasiswa_vb = optional($vb->tugasAkhir)->mahasiswa;
+                    $user_mhs_vb  = optional($mahasiswa_vb)->user;
+                @endphp
                 <tr>
-                    <td>J0403221149</td>
+                    <td>{{ optional($mahasiswa_vb)->nim ?? '-' }}</td>
+                    <td>{{ optional($user_mhs_vb)->name ?? '-' }}</td>
+                    <td>{{ $vb->updated_at ? \Carbon\Carbon::parse($vb->updated_at)->format('d M Y') : '-' }}</td>
+                    <td>{{ Str::limit($vb->catatan_mahasiswa ?? $vb->deskripsi, 50) }}</td>
                     <td>
-                        <span class="role-badge p1">P1</span>
-                        Siti Rahma
+                        @if($vb->file_dokumen)
+                            <a href="{{ asset('storage/'.$vb->file_dokumen) }}" target="_blank" class="btn-proof">
+                                📄 Lihat
+                            </a>
+                        @else
+                            <span style="color:#aaa">-</span>
+                        @endif
+                        @if($vb->link_kegiatan)
+                            <a href="{{ $vb->link_kegiatan }}" target="_blank" style="font-size:12px; margin-left:5px;">🔗 Link</a>
+                        @endif
                     </td>
-                    <td>5 Feb 2026</td>
-                    <td>Sidang Komisi 1</td>
-                    <td><button class="btn-proof">📄 Lihat Bukti</button></td>
                     <td><span class="status-badge verify">Menunggu</span></td>
                     <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view" onclick="openModal('verifikasiModal')">
+                        {{-- Detail --}}
+                        <button class="btn-icon btn-view"
+                            onclick="openVerifikasiBimbinganModal(
+                                '{{ optional($mahasiswa_vb)->nim ?? '-' }}',
+                                '{{ addslashes(optional($user_mhs_vb)->name ?? '-') }}',
+                                '{{ \Carbon\Carbon::parse($vb->tanggal)->format('d M Y') }}',
+                                '{{ addslashes($vb->nama_kegiatan ?? '-') }}',
+                                '{{ addslashes($vb->catatan_mahasiswa ?? $vb->deskripsi ?? '-') }}',
+                                '{{ $vb->file_dokumen ? asset('storage/'.$vb->file_dokumen) : '' }}',
+                                '{{ $vb->link_kegiatan ?? '' }}'
+                            )">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <!-- Setujui -->
-                        <button class="btn-icon btn-approve" onclick="openModal('approveModal')">
+                        {{-- Setujui --}}
+                        <button class="btn-icon btn-approve"
+                            onclick="openApproveModal('bimbingan_verifikasi', {{ $vb->id }})">
                             <i class="fas fa-check"></i>
                         </button>
-                        <!-- Tolak -->
-                        <button class="btn-icon btn-reject" onclick="openModal('rejectModal')">
+                        {{-- Tolak --}}
+                        <button class="btn-icon btn-reject"
+                            onclick="openRejectModal('bimbingan_verifikasi', {{ $vb->id }})">
                             <i class="fas fa-times"></i>
                         </button>
                     </td>
                 </tr>
+                @empty
                 <tr>
-                    <td>J0403221150</td>
-                    <td>
-                        <span class="role-badge p2">P2</span>
-                        Anindya
-                    </td>
-                    <td>10 Feb 2026</td>
-                    <td>Seminar</td>
-                    <td><button class="btn-proof">📄 Lihat Bukti</button></td>
-                    <td><span class="status-badge verify">Menunggu</span></td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view" onclick="openModal('verifikasiModal')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <!-- Setujui -->
-                        <button class="btn-icon btn-approve" onclick="openModal('approveModal')">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <!-- Tolak -->
-                        <button class="btn-icon btn-reject" onclick="openModal('rejectModal')">
-                            <i class="fas fa-times"></i>
-                        </button>
+                    <td colspan="7" style="text-align:center; color:#aaa; padding:20px;">
+                        Tidak ada bukti bimbingan yang menunggu verifikasi.
                     </td>
                 </tr>
-                <tr>
-                    <td>J0403221151</td>
-                    <td>
-                        <span class="role-badge p1">P1</span>
-                        Yasmin
-                    </td>
-                    <td>14 Feb 2026</td>
-                    <td>Kolokium</td>
-                    <td><button class="btn-proof">📄 Lihat Bukti</button></td>
-                    <td><span class="status-badge verify">Menunggu</span></td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view" onclick="openModal('verifikasiModal')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <!-- Setujui -->
-                        <button class="btn-icon btn-approve" onclick="openModal('approveModal')">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <!-- Tolak -->
-                        <button class="btn-icon btn-reject" onclick="openModal('rejectModal')">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </td>
-                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
+
 </div>
 
 
-{{-- Modal Pengajuan Bimbingan--}}
+{{-- Modal Pengajuan Bimbingan --}}
 <div id="pengajuanModal" class="modal-log">
     <div class="modal-content-log">
-
         <div class="modal-header">
             <h4>Detail Pengajuan Bimbingan</h4>
             <span class="close-modal" onclick="closeModal('pengajuanModal')">✖</span>
         </div>
-
         <div class="modal-body">
-
             <div class="log-grid">
                 <div class="label">NIM</div>
                 <div class="colon">:</div>
-                <div class="value">J0403221234</div>
+                <div class="value" id="pm-nim"></div>
 
                 <div class="label">Nama</div>
                 <div class="colon">:</div>
-                <div class="value">Diandra Puteri</div>
+                <div class="value" id="pm-nama"></div>
 
                 <div class="label">Tanggal Pengajuan</div>
                 <div class="colon">:</div>
-                <div class="value">10 Feb 2025</div>
+                <div class="value" id="pm-tgl-pengajuan"></div>
 
                 <div class="label">Rencana Bimbingan</div>
                 <div class="colon">:</div>
-                <div class="value">15 Feb 2025</div>
+                <div class="value" id="pm-rencana"></div>
 
-                <div class="label">Tempat</div>
+                <div class="label">Nama Kegiatan</div>
                 <div class="colon">:</div>
-                <div class="value">Ruang Dosen</div>
-
-                <div class="label">Topik</div>
-                <div class="colon">:</div>
-                <div class="value">Revisi Proposal</div>
+                <div class="value" id="pm-topik"></div>
 
                 <div class="label">Catatan</div>
                 <div class="colon">:</div>
-                <div class="value">Perlu berdiskusi terkait metode</div>
+                <div class="value" id="pm-catatan"></div>
 
-                <div class="label">Status Verifikasi</div>
+                <div class="label">Status</div>
                 <div class="colon">:</div>
-                <div class="value">
-                    <td><span class="status-badge waiting">Menunggu</span></td>
-                </div>
+                <div class="value"><span class="status-badge waiting">Menunggu</span></div>
             </div>
         </div>
     </div>
 </div>
 
-{{-- Modal Verifikasi --}}
+{{-- Modal Verifikasi Milestone --}}
 <div id="verifikasiModal" class="modal-log">
     <div class="modal-content-log">
-
         <div class="modal-header">
-            <h4>Detail Verifikasi Bimbingan</h4>
+            <h4>Detail Verifikasi Milestone</h4>
             <span class="close-modal" onclick="closeModal('verifikasiModal')">✖</span>
         </div>
-
         <div class="modal-body">
-
             <div class="log-grid">
                 <div class="label">NIM</div>
                 <div class="colon">:</div>
-                <div class="value">J0403221234</div>
+                <div class="value" id="vm-nim"></div>
 
                 <div class="label">Nama</div>
                 <div class="colon">:</div>
-                <div class="value">Diandra Puteri</div>
+                <div class="value" id="vm-nama"></div>
 
-                <div class="label">Tanggal Pengajuan</div>
+                <div class="label">Jenis Milestone</div>
                 <div class="colon">:</div>
-                <div class="value">10 Feb 2025</div>
+                <div class="value" id="vm-jenis"></div>
 
-                <div class="label">Rencana Bimbingan</div>
+                <div class="label">Tgl Upload</div>
                 <div class="colon">:</div>
-                <div class="value">15 Feb 2025</div>
-
-                <div class="label">Tempat</div>
-                <div class="colon">:</div>
-                <div class="value">Ruang Dosen</div>
-
-                <div class="label">Topik</div>
-                <div class="colon">:</div>
-                <div class="value">Revisi Proposal</div>
-
-                <div class="label">Hasil Bimbingan</div>
-                <div class="colon">:</div>
-                <div class="value">Bimbingan hari ini berdiskusi terkait metode yang digunakan</div>
+                <div class="value" id="vm-tgl"></div>
 
                 <div class="label">Bukti Bimbingan</div>
                 <div class="colon">:</div>
-                <div class="value">
-                    <button class="btn-proof">📄 Lihat Bukti</button>
-                </div>
+                <div class="value" id="vm-bukti"></div>
 
-                <div class="label">Status Verifikasi</div>
+                <div class="label">Catatan Revisi</div>
                 <div class="colon">:</div>
-                <div class="value">
-                    <td><span class="status-badge verify">Menunggu</span></td>
-                </div>
+                <div class="value" id="vm-catatan"></div>
+
+                <div class="label">Status</div>
+                <div class="colon">:</div>
+                <div class="value"><span class="status-badge verify">Menunggu Verifikasi</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Verifikasi Bukti Bimbingan --}}
+<div id="verifikasiBimbinganModal" class="modal-log">
+    <div class="modal-content-log">
+        <div class="modal-header">
+            <h4>Detail Bukti Bimbingan</h4>
+            <span class="close-modal" onclick="closeModal('verifikasiBimbinganModal')">✖</span>
+        </div>
+        <div class="modal-body">
+            <div class="log-grid">
+                <div class="label">NIM</div>
+                <div class="colon">:</div>
+                <div class="value" id="vbm-nim"></div>
+
+                <div class="label">Nama</div>
+                <div class="colon">:</div>
+                <div class="value" id="vbm-nama"></div>
+
+                <div class="label">Jadwal Bimbingan</div>
+                <div class="colon">:</div>
+                <div class="value" id="vbm-jadwal"></div>
+
+                <div class="label">Nama Dokumen</div>
+                <div class="colon">:</div>
+                <div class="value" id="vbm-nama-dok"></div>
+
+                <div class="label">Catatan Mahasiswa</div>
+                <div class="colon">:</div>
+                <div class="value" id="vbm-catatan"></div>
+
+                <div class="label">Berkas & Link</div>
+                <div class="colon">:</div>
+                <div class="value" id="vbm-berkas"></div>
+
+                <div class="label">Status</div>
+                <div class="colon">:</div>
+                <div class="value"><span class="status-badge verify">Menunggu Verifikasi</span></div>
             </div>
         </div>
     </div>
@@ -444,636 +454,63 @@
 {{-- Modal Setujui --}}
 <div id="approveModal" class="modal-log">
     <div class="modal-content-log">
-
         <div class="modal-header">
-            <h4>Setujui Bimbingan</h4>
+            <h4>Setujui Milestone</h4>
             <span class="close-modal" onclick="closeModal('approveModal')">✖</span>
         </div>
-
         <div class="modal-body">
-
-            <div class="mb-2">Catatan :</div>
-            <textarea style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;"></textarea>
-
+            <div class="mb-2">Catatan (opsional):</div>
+            <textarea id="approve-catatan" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;" rows="3"></textarea>
         </div>
-
         <div class="modal-footer-log">
             <button class="btn-close-log" onclick="closeModal('approveModal')">Batal</button>
-            <button class="btn-acc">Setujui</button>
+            <button class="btn-acc" onclick="submitAction('disetujui')">Setujui</button>
         </div>
     </div>
 </div>
-
 
 {{-- Modal Tolak --}}
 <div id="rejectModal" class="modal-log">
     <div class="modal-content-log">
-
         <div class="modal-header">
             <h4>Tolak Pengajuan</h4>
             <span class="close-modal" onclick="closeModal('rejectModal')">✖</span>
         </div>
-
         <div class="modal-body">
-
-            <div class="mb-2">Catatan:</div>
-            <textarea style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;"></textarea>
-
+            <div class="mb-2">Alasan penolakan:</div>
+            <textarea id="reject-catatan" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;" rows="3" placeholder="Tuliskan alasan penolakan..."></textarea>
         </div>
-
         <div class="modal-footer-log">
             <button class="btn-close-log" onclick="closeModal('rejectModal')">Batal</button>
-            <button class="btn-reject">Tolak</button>
+            <button class="btn-reject-btn" onclick="submitAction('ditolak')">Tolak</button>
         </div>
     </div>
 </div>
 
+{{-- Hidden form untuk submit --}}
+<form id="actionForm" method="POST" style="display:none;">
+    @csrf
+    @method('POST')
+    <input type="hidden" name="status" id="action-status">
+    <input type="hidden" name="catatan" id="action-catatan">
+</form>
+
 @endsection
 
 @push('styles')
-<style>
-
-.main {
-    flex: 1;
-    padding: 25px;
-    background: #f4f6f9;
-}
-
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.topbar-right img {
-    width: 35px;
-    border-radius: 50%;
-}
-
-/* Cards */
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.card {
-    padding: 20px;
-    border-radius: 15px;
-    color: white;
-    box-shadow: 0 8px 15px rgba(0,0,0,0.08);
-}
-
-.blue { background: #02048d; }
-.green { background: #00a806; }
-.yellow { background: #f6c23e; color: #000; }
-.red { background: #ff1500; }
-
-.card h2 {
-    font-size: 28px;
-}
-
-/* Chart Box */
-.box {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 30px;
-    box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-}
-
-.box-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-#filterTahun {
-    padding: 6px 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-.highlight-bar {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.highlight-item {
-    flex: 1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 18px;
-    border-radius: 20px;
-    background: #ffffff;
-    border: 1px solid #f0f0f0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-}
-
-/* teks kiri */
-.highlight-text {
-    font-weight: 500;
-    color: #555;
-}
-
-/* angka kanan */
-.highlight-number {
-    min-width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: #eef2ff;
-    color: #3b4cca;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* variant warning */
-.warning .highlight-number {
-    background: #fde8e8;
-    color: #e74a3b;
-}
-
-.clickable-card {
-    text-decoration: none; /* ⬅️ ini yang ngilangin garis bawah */
-    color: inherit;
-    cursor: pointer;
-    transition: all .18s ease;
-}
-
-/* penting juga untuk state hover & visited */
-.clickable-card:hover,
-.clickable-card:focus,
-.clickable-card:visited {
-    text-decoration: none;
-    color: inherit;
-}
-
-.page-wrapper {
-    padding: 24px;
-}
-
-.page-title {
-    font-size: 22px;
-    font-weight: 600;
-    margin-bottom: 20px;
-}
-
-/* SUMMARY */
-.summary-wrapper {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.summary-card {
-    background: white;
-    border-radius: 12px;
-    padding: 14px 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    min-width: 260px;   /* diperbesar */
-    gap: 15px;          /* jarak antar isi */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    border: 1px solid #eef1f6;
-}
-
-.summary-text {
-    font-size: 14px;
-    color: #6c757d;
-    flex: 1;            /* biar text ambil ruang */
-}
-
-.summary-number {
-    background: #4e73df;
-    color: white;
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-weight: 600;
-    min-width: 32px;
-    text-align: center;
-}
-
-
-/* CARD BOX */
-.card-box {
-    background: white;
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-}
-
-/* HEADER */
-.card-header {
-    font-weight: 600;
-    margin-bottom: 12px;
-}
-
-
-/* TABLE */
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-.table-custom {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-.table-custom th {
-    background: #f8f9fc;
-    padding: 10px;
-    font-size: 13px;
-    text-align: center;
-    color: #6c757d;
-}
-
-.table-custom td {
-    padding: 10px;
-    border-top: 1px solid #eee;
-    font-size: 14px;
-    word-wrap: break-word;
-}
-
-table th, table td {
-    padding: 14px;
-    text-align: center;
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-table td:nth-child(2)  {
-    text-align: left;
-}
-
-
-td {
-    word-break: break-word;
-}
-
-
-/* STATUS BADGE */
-.status-badge {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.waiting {
-    background: #fff4e5;
-    color: #f6a500;
-}
-
-.approved {
-    background: #e6f7ee;
-    color: #1cc88a;
-}
-
-.verify {
-    background: #e7f1ff;
-    color: #4e73df;
-}
-
-.valid {
-    background: #e6f7ee;
-    color: #1cc88a;
-}
-
-
-/* BUTTON */
-.btn-acc {
-    background: #1cc88a;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.btn-reject {
-    background: #e74a3b;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.btn-detail {
-    background: #36b9cc;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.btn-proof {
-    background: #858796;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-/* badge status */
-.status-badge {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    display: inline-block;
-}
-
-/* sudah = hijau */
-.status-badge.done {
-    background: #e6f7ee;
-    color: #1cc88a;
-}
-
-/* belum = merah */
-.status-badge.pending {
-    background: #fde8e8;
-    color: #e74a3b;
-}
-
-.btn-view-log {
-    border: none;
-    padding: 6px 14px;
-    border-radius: 8px;
-    background: #36b9cc;
-    color: white;
-    font-size: 13px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-view-log:hover {
-    background: #2c9faf;
-}
-
-.modal-log {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(4px);
-    z-index: 999;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.modal-content-log {
-    background: white;
-    width: 540px;
-    max-width: 100%;
-    border-radius: 20px;
-    padding: 24px;
-    animation: fadeIn .25s ease;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-    border: 1px solid #eef2f7;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 18px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.modal-header h4 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1f2937;
-}
-
-.close-modal {
-    cursor: pointer;
-    font-size: 18px;
-}
-
-.log-grid {
-    display: grid;
-    grid-template-columns: 180px 10px 1fr;
-    gap: 12px 14px;
-    font-size: 14px;
-    align-items: start;
-}
-
-.colon {
-    text-align: center;
-    color: #6b7280;
-    font-weight: 600;
-}
-
-.modal-actions {
-    text-align: right;
-    margin-top: 20px;
-}
-
-@keyframes fadeIn {
-    from {transform: scale(0.95); opacity: 0;}
-    to {transform: scale(1); opacity: 1;}
-}
-.modal-footer-log {
-    text-align: right;
-    margin-top: 20px;
-}
-
-.btn-close-log {
-    background: #858796;
-    color: white;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-icon {
-    border: none;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-/* Warna */
-.btn-view {
-    background: #0dcaf0;
-}
-
-.btn-approve {
-    background: #198754;
-}
-
-.btn-reject {
-    background: #dc3545;
-}
-
-/* Hover */
-.btn-icon:hover {
-    transform: scale(1.05);
-    opacity: 0.9;
-}
-
-.role-badge {
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    margin-left: 6px;
-    font-weight: 600;
-}
-
-.role-badge.p1 {
-    background: #e8f0ff;
-    color: #3b4cca;
-}
-
-.role-badge.p2 {
-    background: #e6f4ea;
-    color: #1cc88a;
-}
-
-</style>
+    <link rel="stylesheet" href="{{ asset('css/dosen/dosen-shared.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dosen/d-dashboard.css') }}">
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-
-    const dataPerTahun = {
-        2021: {
-            belum: [30,25,20,15,10,8,5,3,2,1,0],
-            sudah: [0,5,10,15,20,22,25,27,28,29,30]
-        },
-        2022: {
-            belum: [40,30,25,18,12,10,6,4,3,2,1],
-            sudah: [0,10,15,22,28,30,34,36,37,38,39]
-        },
-        2023: {
-            belum: [50,45,35,25,15,12,8,5,3,2,1],
-            sudah: [0,5,15,25,35,38,42,45,47,48,49]
-        }
+    window.dashboardData = {
+        milestoneLabels: @json(array_keys($milestoneStats)),
+        milestoneSudah: @json(array_column($milestoneStats, 'sudah')),
+        milestoneBelum: @json(array_column($milestoneStats, 'belum')),
+        statsByYear: @json($statsByYear ?? []),
+        chartBimbingan: @json($chartBimbingan)
     };
-
-    const ctx1 = document.getElementById('barChart');
-
-    let chart = new Chart(ctx1, {
-        type: 'bar',
-        data: {
-            labels: [
-                'Penetapan Komisi',
-                'Sidang Komisi 1',
-                'Kolokium',
-                'Proposal',
-                'Penelitian',
-                'Evaluasi',
-                'Sidang Komisi 2',
-                'Seminar',
-                'Publikasi',
-                'Ujian Tesis',
-                'SKL'
-            ],
-            datasets: [
-                {
-                    label: 'Belum',
-                    data: dataPerTahun[2021].belum,
-                    backgroundColor: '#4e73df'
-                },
-                {
-                    label: 'Sudah',
-                    data: dataPerTahun[2021].sudah,
-                    backgroundColor: '#f6c23e'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: { stacked: true },
-                y: { stacked: true }
-            }
-        }
-    });
-
-    document.getElementById('filterTahun')
-    .addEventListener('change', function () {
-
-        let tahun = this.value;
-
-        chart.data.datasets[0].data = dataPerTahun[tahun].belum;
-        chart.data.datasets[1].data = dataPerTahun[tahun].sudah;
-
-        chart.update();
-    });
-
-    const ctx2 = document.getElementById('lineChart');
-
-    new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-            datasets: [{
-                label: 'Bimbingan',
-                data: [5,18,25,6,17,26,13,7,18,6,18,25],
-                backgroundColor: '#9b59b6'
-            }]
-        }
-    });
-
-});
-
-function openModal(id) {
-    document.getElementById(id).style.display = "flex";
-}
-
-function closeModal(id) {
-    document.getElementById(id).style.display = "none";
-}
-
-/* optional: klik luar modal untuk close */
-window.addEventListener('click', function(e) {
-    const modal = document.getElementById('logModal');
-    if (e.target === modal) {
-        modal.style.display = 'none';
-    }
-});
-
 </script>
+<script src="{{ asset('js/dosen/d-dashboard.js') }}"></script>
 @endpush

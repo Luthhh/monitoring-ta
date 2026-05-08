@@ -59,7 +59,7 @@
 </div>
 
 <div class="main">
-    <h2>Detail Mahasiswa</h2>
+    <h2>Data Mahasiswa</h2>
 
     <!-- ================= INFO MAHASISWA ================= -->
     <div class="card">
@@ -85,7 +85,7 @@
             <div>
                 <span class="label">Tahun Masuk</span>
                 <span class="colon">:</span>
-                <span class="value">2020/2021</span>
+                <span class="value">2020</span>
             </div>
             <div>
                 <span class="label">Semester</span>
@@ -94,12 +94,12 @@
             </div>
             <div>
                 <span class="label">Pembimbing 1</span>
-                <span class="colon">:</span><span class="value">
+                <span class="colon">:</span>
                 <span class="value">Ibu Dini Nurul Azizah</span>
             </div>
             <div>
                 <span class="label">Pembimbing 2</span>
-                <span class="colon">:</span><span class="value">
+                <span class="colon">:</span>
                 <span class="value">Ibu Nurul Azizah</span>
             </div>
         </div>
@@ -649,6 +649,7 @@
 </style>
 @endsection
 
+@push('scripts')
 <script>
 function openLogModal() {
     document.getElementById('logModal').style.display = 'flex';
@@ -666,3 +667,4 @@ window.addEventListener('click', function(e) {
     }
 });
 </script>
+@endpush

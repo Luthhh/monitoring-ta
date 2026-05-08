@@ -1,0 +1,74 @@
+/* Total Mahasiswa specific styles - Restored to original design */
+
+.cards-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card-stat {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.table-tools {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.table-tools input,
+.table-tools select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Badge specific to this page */
+.badge-blue {
+    background: #02048d;
+    color: white;
+}
+
+/* TABLE Total Mahasiswa specific */
+table th,
+table td {
+    padding: 14px;
+    text-align: center;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+table thead {
+    background: #f1f2f6;
+}
+
+table tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+table td:nth-child(4) {
+    max-width: 200px;
+    word-break: break-word;
+    text-align: left;
+}
+
+/* Kolom milestone */
+table td:nth-child(6) {
+    max-width: 220px;
+}

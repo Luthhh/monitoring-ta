@@ -8,54 +8,86 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<!-- Alert section -->
+@if(session('success'))
+    <div class="alert alert-success mt-2">{{ session('success') }}</div>
+@endif
+@if($errors->any())
+    <div class="alert alert-danger mt-2">
+        <ul class="mb-0">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <!-- Statistik -->
-<div class="cards">
+<div class="cards mt-3">
     <a href="{{ url('/admin/total-mahasiswa') }}" class="card blue text-decoration-none">
-        <h2>2</h2>
+        <h2>{{ $mahasiswas->count() }}</h2>
         <p>Mahasiswa Aktif</p>
     </a>
     <a href="{{ url('/admin/ahead-mahasiswa') }}" class="card green text-decoration-none">
-        <h2>2</h2>
+        <h2>{{ $ahead }}</h2>
         <p>Ahead</p>
     </a>
     <a href="{{ url('/admin/ideal-mahasiswa') }}" class="card yellow text-decoration-none">
-        <h2>0</h2>
+        <h2>{{ $ideal }}</h2>
         <p>Ideal</p>
     </a>
     <a href="{{ url('/admin/behind-mahasiswa') }}" class="card red text-decoration-none">
-        <h2>0</h2>
+        <h2>{{ $behind }}</h2>
         <p>Behind</p>
     </a>
 </div>
 
-<div class="table-tools">
-    <input type="text" id="searchInput" placeholder="🔍 Cari nama mahasiswa...">
-    <select id="sortTahun">
+<form action="{{ route('admin.manajemen-mahasiswa') }}" method="GET" class="table-tools" id="filterForm">
+    <input type="text" name="search" id="searchInput" placeholder="🔍 Cari nama atau NIM..." value="{{ request('search') }}">
+    <select name="tahun" id="sortTahun">
         <option value="">Semua Tahun</option>
-        <option value="2020/2021">2020/2021</option>
-        <option value="2021/2022">2021/2022</option>
-        <option value="2022/2023">2022/2023</option>
-        <option value="2023/2024">2023/2024</option>
+        @foreach($tahunMasukList as $tahun)
+            <option value="{{ $tahun }}" {{ request('tahun') == $tahun ? 'selected' : '' }}>{{ $tahun }}</option>
+        @endforeach
     </select>
-    <select id="sortSemester">
+    <select name="semester" id="sortSemester">
         <option value="">Semua Semester</option>
-        <option value="1">Semester 1</option>
-        <option value="2">Semester 2</option>
-        <option value="3">Semester 3</option>
-        <option value="4">Semester 4</option>
-        <option value="5">Semester 5</option>
-        <option value="6">Semester 6</option>
-        <option value="7">Semester 7</option>
-        <option value="8">Semester 8</option>
+        @for($i=1; $i<=8; $i++)
+            <option value="{{ $i }}" {{ request('semester') == $i ? 'selected' : '' }}>Semester {{ $i }}</option>
+        @endfor
     </select>
-</div>
+    <select name="dosen" id="sortDosen">
+        <option value="">Semua Dosen</option>
+        @foreach($dosens as $d)
+            <option value="{{ $d->user->name }}" {{ request('dosen') == $d->user->name ? 'selected' : '' }}>{{ $d->user->name }}</option>
+        @endforeach
+    </select>
+</form>
 
 <div class="table-mahasiswa">
     <div class="table-header">
         <h3>Tabel Mahasiswa</h3>
-        <a href="" class="btn-create">
-            + Tambah Mahasiswa
-        </a>
+            <div class="d-flex gap-2 flex-wrap">
+            {{-- Import --}}
+            <button class="btn-import" data-bs-toggle="modal" data-bs-target="#importModal">
+                📥 Import Excel/CSV
+            </button>
+            {{-- Export --}}
+            <div class="dropdown">
+                <button class="btn-export dropdown-toggle" type="button" id="dropdownExport" data-bs-toggle="dropdown" aria-expanded="false">
+                    📤 Export
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownExport">
+                    <li><a class="dropdown-item" href="{{ route('admin.mahasiswa.export-excel') }}">📊 Export Excel (.xlsx)</a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.mahasiswa.export-csv') }}">📄 Export CSV</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.mahasiswa.template') }}">📋 Download Template Import</a></li>
+                </ul>
+            </div>
+            <button class="btn-create border-0 cursor-pointer" data-bs-toggle="modal" data-bs-target="#tambahMahasiswaModal">
+                + Tambah Mahasiswa
+            </button>
+        </div>
     </div>
         <table id="tabelMahasiswa">
             <thead>
@@ -65,356 +97,213 @@
                     <th>Nama</th>
                     <th>Tahun Masuk</th>
                     <th>Semester</th>
-                    <th>Milestone Terakhir</th>
-                    <th>Aksi</th>
+                    <th>Prodi</th>
+                    <th>Detail</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>J0403221149</td>
-                    <td>Luthfi Dika Chandra</td>
-                    <td>2020/2021</td>
-                    <td>3</td>
+                @foreach($mahasiswas as $index => $mhs)
+                <tr class="align-middle" 
+                    data-tahun="{{ $mhs->tahun_masuk }}" 
+                    data-semester="{{ $mhs->semester }}"
+                    data-d1="{{ optional($mhs->pembimbing1)->user->name ?? '' }}" 
+                    data-d2="{{ optional($mhs->pembimbing2)->user->name ?? '' }}">
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $mhs->nim }}</td>
+                    <td>{{ $mhs->user->name }}</td>
+                    <td>{{ $mhs->angkatan_formatted }}</td>
+                    <td>{{ $mhs->semester }}</td>
                     <td>
                         <span class="badge badge-blue">
-                            Kolokium
+                            {{ $mhs->prodi }}
                         </span>
                     </td>
                     <td class="action-buttons">
                         <!-- Lihat -->
-                        <button class="btn-icon btn-view">
+                        <a href="{{ route('admin.detail-mahasiswa', $mhs->id) }}" class="btn-icon btn-view text-decoration-none" title="Lihat Detail">
                             <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn-icon btn-edit">
+                        </a>
+                        <button class="btn-icon btn-edit" data-bs-toggle="modal" data-bs-target="#editMahasiswaModal-{{ $mhs->id }}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-icon btn-delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <form action="{{ route('admin.mahasiswa.destroy', $mhs->id) }}" method="POST" class="d-inline form-confirm" data-text="Yakin ingin menghapus mahasiswa ini?">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-icon btn-delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
                     </td>
                 </tr>
-                <tr>
-                    <td>2</td>
-                    <td>J0403221149</td>
-                    <td>Luthfi Dika Chandra</td>
-                    <td>2020/2021</td>
-                    <td>3</td>
-                    <td>
-                        <span class="badge badge-blue">
-                            Kolokium
-                        </span>
-                    </td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn-icon btn-edit">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon btn-delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
+                @endforeach
+                @if($mahasiswas->isEmpty())
+                <tr class="empty-row">
+                    <td colspan="7" class="text-center">Belum ada data mahasiswa</td>
                 </tr>
+                @else
+                <tr class="empty-row" style="display: none;">
+                    <td colspan="7" class="text-center">Tidak ada mahasiswa yang sesuai dengan filter</td>
+                </tr>
+                @endif
             </tbody>
         </table>
     </div>
+    <div class="mt-4 d-flex justify-content-center">
+        {{ $mahasiswas->links() }}
+    </div>
 </div>
 
+@foreach($mahasiswas as $mhs)
+<!-- Modal Edit Mahasiswa -->
+<div class="modal fade" id="editMahasiswaModal-{{ $mhs->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('admin.mahasiswa.update', $mhs->id) }}" method="POST" class="modal-content">
+            @csrf
+            @method('PUT')
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Mahasiswa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" name="name" class="form-control" value="{{ $mhs->user->name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">NIM</label>
+                    <input type="text" name="nim" class="form-control" value="{{ $mhs->nim }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ $mhs->user->email }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Prodi</label>
+                    <input type="text" name="prodi" class="form-control" value="{{ $mhs->prodi }}" required>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Tahun Masuk</label>
+                        <input type="number" name="tahun_masuk" class="form-control" value="{{ $mhs->tahun_masuk }}" required>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Semester</label>
+                        <input type="number" name="semester" class="form-control" value="{{ $mhs->semester }}" required>
+                    </div>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <label class="form-label">Password Baru (Kosongkan Jika Tidak Diubah)</label>
+                    <div class="input-group" style="display: flex;">
+                        <input type="password" name="password" class="form-control password-input" style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                        <button class="btn btn-outline-secondary toggle-password" type="button" style="border: 1px solid #ced4da; border-left: none; border-radius: 0 10px 10px 0;">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endforeach
+
+<!-- Modal Tambah Mahasiswa -->
+<div class="modal fade" id="tambahMahasiswaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('admin.mahasiswa.store') }}" method="POST" class="modal-content">
+            @csrf
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Mahasiswa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start">
+                <div class="mb-3">
+                    <label class="form-label">Nama</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">NIM</label>
+                    <input type="text" name="nim" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Prodi</label>
+                    <input type="text" name="prodi" class="form-control" required>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Tahun Masuk</label>
+                        <input type="number" name="tahun_masuk" class="form-control" value="{{ date('Y') }}" required>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Semester</label>
+                        <input type="number" name="semester" class="form-control" value="1" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group" style="display: flex;">
+                        <input type="password" name="password" class="form-control password-input" required style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                        <button class="btn btn-outline-secondary toggle-password" type="button" style="border: 1px solid #ced4da; border-left: none; border-radius: 0 10px 10px 0;">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Tambah</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Modal Import --}}
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('admin.mahasiswa.import') }}" method="POST" enctype="multipart/form-data" class="modal-content">
+            @csrf
+            <div class="modal-header">
+                <h5 class="modal-title">📥 Import Mahasiswa dari Excel/CSV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-start">
+                <div class="alert" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;font-size:13px;">
+                    <strong>📋 Format kolom yang diperlukan:</strong><br>
+                    <code>nim, nama, email, prodi, tahun_masuk, semester, password</code><br><br>
+                    Password bersifat opsional. Jika kosong, password default = NIM mahasiswa.<br>
+                    Baris yang duplikat (NIM/email sudah ada) akan dilewati otomatis.
+                </div>
+                <div class="mb-3 mt-3">
+                    <label class="form-label fw-semibold">Pilih File</label>
+                    <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+                    <div class="form-text">Format: .xlsx, .xls, atau .csv. Maks 5MB.</div>
+                </div>
+                <a href="{{ route('admin.mahasiswa.template') }}" class="btn btn-outline-secondary btn-sm">
+                    📋 Download Template CSV
+                </a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Import</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @endsection
 
-@push('scripts')
-<style>
-.main {
-    background: #f4f6fb;
-    padding: 30px;
-}
-
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 25px;
-}
-
-.cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.card {
-    padding: 20px;
-    border-radius: 15px;
-    color: white;
-    box-shadow: 0 8px 15px rgba(0,0,0,0.08);
-}
-
-.blue { background: #02048d; }
-.green { background: #00a806; }
-.yellow { background: #f6c23e; color: #000; }
-.red { background: #ff1500; }
-
-.card h2 {
-    font-size: 28px;
-}
-
-.table-mahasiswa {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-table th, table td {
-    padding: 14px;
-    text-align: center;
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-table thead {
-    background: #f1f2f6;
-}
-
-table tbody tr {
-    border-bottom: 1px solid #eee;
-}
-
-td:nth-child(3) {
-    max-width: 200px;
-    word-break: break-word;
-}
-
-table td:nth-child(3)  {
-    text-align: left;
-}
-
-td {
-    word-break: break-word;
-}
-
-.badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    display: inline-block;
-    color: white;
-}
-
-.stat-blue {
-    background: #02048d;
-    color: white;
-}
-
-.badge-blue {
-    background: #02048d;
-    color: white;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: center;   /* 🔥 ini bikin center */
-    align-items: center;
-}
-
-.btn-icon {
-    border: none;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-/* Warna */
-.btn-view {
-    background: #0dcaf0;
-}
-
-.btn-edit {
-    background: #ffc107;
-}
-.btn-delete {
-    background: #dc3545;
-}
-
-.table-tools {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 15px;
-}
-
-.table-tools input,
-.table-tools select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.role-badge {
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    margin-left: 6px;
-    font-weight: 600;
-}
-
-/* HEADER TABLE */
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.table-header h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0;
-}
-
-/* BUTTON CREATE */
-.btn-create {
-    background: #02048d;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: 0.2s;
-}
-
-.btn-create:hover {
-    background: #1a1bb8;
-    color: white;
-}
-
-
-</style>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/a-manajemenmahasiswa.css') }}">
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-
-    const dataPerTahun = {
-        2021: {
-            belum: [30,25,20,15,10,8,5,3,2,1,0],
-            sudah: [0,5,10,15,20,22,25,27,28,29,30]
-        },
-        2022: {
-            belum: [40,30,25,18,12,10,6,4,3,2,1],
-            sudah: [0,10,15,22,28,30,34,36,37,38,39]
-        },
-        2023: {
-            belum: [50,45,35,25,15,12,8,5,3,2,1],
-            sudah: [0,5,15,25,35,38,42,45,47,48,49]
-        }
-    };
-
-    const ctx1 = document.getElementById('barChart');
-
-    let chart = new Chart(ctx1, {
-        type: 'bar',
-        data: {
-            labels: [
-                'Penetapan Komisi',
-                'Sidang Komisi 1',
-                'Kolokium',
-                'Proposal',
-                'Penelitian',
-                'Evaluasi',
-                'Sidang Komisi 2',
-                'Seminar',
-                'Publikasi',
-                'Ujian Tesis',
-                'SKL'
-            ],
-            datasets: [
-                {
-                    label: 'Belum',
-                    data: dataPerTahun[2021].belum,
-                    backgroundColor: '#4e73df'
-                },
-                {
-                    label: 'Sudah',
-                    data: dataPerTahun[2021].sudah,
-                    backgroundColor: '#f6c23e'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: { stacked: true },
-                y: { stacked: true }
-            }
-        }
-    });
-
-    document.getElementById('filterTahun')
-    .addEventListener('change', function () {
-
-        let tahun = this.value;
-
-        chart.data.datasets[0].data = dataPerTahun[tahun].belum;
-        chart.data.datasets[1].data = dataPerTahun[tahun].sudah;
-
-        chart.update();
-    });
-
-    const ctx2 = document.getElementById('lineChart');
-
-    new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-            datasets: [{
-                label: 'Bimbingan',
-                data: [5,18,25,6,17,26,13,7,18,6,18,25],
-                backgroundColor: '#9b59b6'
-            }]
-        }
-    });
-
-});
-
-function openModal(id) {
-    document.getElementById(id).style.display = "flex";
-}
-
-function closeModal(id) {
-    document.getElementById(id).style.display = "none";
-}
-
-/* optional: klik luar modal untuk close */
-window.addEventListener('click', function(e) {
-    const modal = document.getElementById('logModal');
-    if (e.target === modal) {
-        modal.style.display = 'none';
-    }
-});
-
-</script>
+    <script src="{{ asset('js/admin/a-manajemenmahasiswa.js') }}"></script>
 @endpush
-

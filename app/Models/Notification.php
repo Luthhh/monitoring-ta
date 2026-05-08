@@ -17,6 +17,11 @@ class Notification extends Model
         'created_at',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'is_read'    => 'boolean',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

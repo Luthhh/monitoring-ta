@@ -4,71 +4,111 @@
 
 @section('page-content')
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <div class="topbar">
     <h1>Dashboard Admin</h1>
-    <div>Admin User</div>
+    <div class="d-flex align-items-center gap-3">
+        <a href="{{ route('admin.export-mahasiswa') }}" class="btn btn-success btn-sm" style="background:#27ae60; color:white; border:none; padding:8px 15px; border-radius:8px; text-decoration:none;">
+            <i class="fas fa-file-excel me-1"></i> Export Excel
+        </a>
+        <div>{{ auth()->user()->name ?? 'Admin' }}</div>
+    </div>
 </div>
 
 <!-- Statistik -->
 <div class="cards">
     <a href="{{ url('/admin/total-mahasiswa') }}" class="card blue text-decoration-none">
-        <h2>2</h2>
+        <h2>{{ $totalMahasiswa }}</h2>
         <p>Mahasiswa Aktif</p>
     </a>
     <a href="{{ url('/admin/ahead-mahasiswa') }}" class="card green text-decoration-none">
-        <h2>2</h2>
+        <h2>{{ $ahead }}</h2>
         <p>Ahead</p>
     </a>
     <a href="{{ url('/admin/ideal-mahasiswa') }}" class="card yellow text-decoration-none">
-        <h2>0</h2>
+        <h2>{{ $ideal }}</h2>
         <p>Ideal</p>
     </a>
     <a href="{{ url('/admin/behind-mahasiswa') }}" class="card red text-decoration-none">
-        <h2>0</h2>
+        <h2>{{ $behind }}</h2>
         <p>Behind</p>
     </a>
 </div>
 
-<div class="highlight-bar">
-    <a href="{{ url('/admin/aktivitas-bimbingan') }}" class="highlight-item warning clickable-card">
-        <div class="highlight-text">
-            🔔 Mahasiswa tidak bimbingan &gt; 30 hari
-        </div>
-        <div class="highlight-number">2</div>
-    </a>
+{{-- Ringkasan Bimbingan Bulanan (Global) --}}
+<h3 style="margin-bottom: 15px; font-size: 17px; font-weight: 700; color: #1e293b;">📅 Ringkasan Aktivitas Bimbingan (Bulan Ini)</h3>
+<div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 30px;">
+    <div class="card" style="background: white; border: 1px solid #e2e8f0; color: #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 18px;">
+        <span style="font-size: 13px; color: #64748b; font-weight: 600;">Total Rencana Bimbingan</span>
+        <span style="font-size: 26px; font-weight: 800; color: #4e73df;">{{ $rencanaBimbinganBulanIni }}</span>
+    </div>
+    <div class="card" style="background: white; border: 1px solid #e2e8f0; color: #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 18px;">
+        <span style="font-size: 13px; color: #64748b; font-weight: 600;">Total Bimbingan Terlaksana</span>
+        <span style="font-size: 26px; font-weight: 800; color: #1cc88a;">{{ $terlaksanaBulanIni }}</span>
+    </div>
+    <div class="card" style="background: white; border: 1px solid #e2e8f0; color: #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 18px;">
+        <span style="font-size: 13px; color: #64748b; font-weight: 600;">Bimbingan Sedang Berjalan (Aktif)</span>
+        <span style="font-size: 26px; font-weight: 800; color: #f6c23e;">{{ $jumlahBimbinganAktif }}</span>
+    </div>
 </div>
+
+
 
 <!-- ================= CARD KRITIS ================= -->
 <div class="kritis-wrapper">
 
-    <!-- 🔴 KRITIS (lebih mencolok) -->
-    <div class="kritis-card danger highlight">
-        <div class="kritis-header">
-            <span class="kritis-icon">🚨</span>
-            <span class="kritis-title">Mahasiswa Kritis</span>
+    <!-- 🔵 Tidak Bimbingan > 30 Hari -->
+    <a href="{{ route('admin.aktivitas-bimbingan') }}" class="kritis-card danger top-row text-decoration-none">
+        <div class="d-flex flex-column gap-1">
+            <div class="kritis-header">
+                <span class="kritis-title">Tidak Bimbingan > 30 Hari</span>
+                <i class="fas fa-clock-rotate-left" style="color: #f6a500; font-size: 18px;"></i>
+            </div>
+            <div class="kritis-desc">Butuh pengingat bimbingan</div>
         </div>
-        <div class="kritis-value">{{ $mhsKritis ?? 0 }}</div>
-        <div class="kritis-desc">Butuh perhatian segera</div>
-    </div>
+        <div class="kritis-value" style="color: #f6a500;">{{ $tidakBimbingan30 }}</div>
+    </a>
+
+    <!-- 📄 Pengingat BAP -->
+    <a href="#tabelUploadBap" class="kritis-card info top-row text-decoration-none">
+        <div class="d-flex flex-column gap-1">
+            <div class="kritis-header">
+                <span class="kritis-title">Pengingat BAP</span>
+                <i class="fas fa-file-signature" style="color: #0ea5e9; font-size: 18px;"></i>
+            </div>
+            <div class="kritis-desc">Seminar/Ujian Belum BAP</div>
+        </div>
+        <div class="kritis-value" style="color: #0ea5e9;">{{ $bapPendingCount }}</div>
+    </a>
 
     <!-- 🟠 Mendekati -->
-    <div class="kritis-card warning">
-        <div class="kritis-title">Mendekati Batas Studi</div>
-        <div class="kritis-value">{{ $mhsMendekati ?? 0 }}</div>
-        <div class="kritis-desc">Perlu monitoring</div>
-    </div>
+    <a href="{{ url('/admin/mendekati-batas-studi') }}" class="kritis-card warning bottom-row text-decoration-none">
+        <div class="kritis-header">
+            <span class="kritis-title">Mendekati Batas Studi</span>
+            <i class="fas fa-hourglass-half" style="color: #f59e0b; font-size: 18px;"></i>
+        </div>
+        <div class="kritis-value" style="color: #f59e0b;">{{ $mhsMendekati }}</div>
+        <div class="kritis-desc text-warning">Perlu monitoring</div>
+    </a>
 
     <!-- 🟢 Tepat waktu -->
-    <div class="kritis-card success">
-        <div class="kritis-title">On Track Tepat Waktu</div>
-        <div class="kritis-value">{{ $mhsTepatWaktu ?? 0 }}</div>
-        <div class="kritis-desc">Kinerja baik</div>
-    </div>
+    <a href="{{ url('/admin/ontrack-mahasiswa') }}" class="kritis-card success bottom-row text-decoration-none">
+        <div class="kritis-header">
+            <span class="kritis-title">Lulus Tepat Waktu</span>
+            <i class="fas fa-user-check" style="color: #10b981; font-size: 18px;"></i>
+        </div>
+        <div class="kritis-value" style="color: #10b981;">{{ $mhsTepatWaktu }}</div>
+        <div class="kritis-desc text-success">Kinerja baik</div>
+    </a>
 
+    <!-- 🔴 KRITIS (lebih mencolok) -->
+    <a href="{{ url('/admin/kritis-mahasiswa') }}" class="kritis-card danger highlight bottom-row text-decoration-none">
+        <div class="kritis-header">
+            <span class="kritis-title">Mahasiswa Kritis</span>
+            <i class="fas fa-triangle-exclamation" style="color: #ef4444; font-size: 18px;"></i>
+        </div>
+        <div class="kritis-value" style="color: #ef4444;">{{ $mhsKritis }}</div>
+        <div class="kritis-desc text-danger">Butuh perhatian segera</div>
+    </a>
 </div>
 
 <div class="box">
@@ -76,13 +116,26 @@
         <h3>Status Masa Studi</h3>
 
         <select id="filterAngkatanPie">
-            <option value="2021">Angkatan 2021</option>
-            <option value="2022">Angkatan 2022</option>
-            <option value="2023">Angkatan 2023</option>
+            <option value="all">Semua Angkatan</option>
+            @foreach($all_years as $tahun)
+                <option value="{{ $tahun }}">{{ $tahun }}</option>
+            @endforeach
         </select>
     </div>
 
-    <canvas id="statusChart" height="120"></canvas>
+    <div class="chart-container-pie">
+        <canvas id="statusChart"></canvas>
+    </div>
+</div>
+
+{{-- GRAFIK BIMBINGAN TREND (NEW) --}}
+<div class="box">
+    <div class="box-header">
+        <h3>📉 Trend Aktivitas Bimbingan (6 Bulan Terakhir)</h3>
+    </div>
+    <div class="chart-container-bar" style="height: 300px;">
+        <canvas id="bimbinganTrendChart"></canvas>
+    </div>
 </div>
 
 <div class="box">
@@ -90,24 +143,220 @@
     <h3>Sebaran Mahasiswa</h3>
 
     <select id="filterTahun">
-        <option value="2021">Angkatan 2021</option>
-        <option value="2022">Angkatan 2022</option>
-        <option value="2023">Angkatan 2023</option>
+        <option value="all">Semua Angkatan</option>
+        @foreach($all_years as $tahun)
+            <option value="{{ $tahun }}">{{ $tahun }}</option>
+        @endforeach
     </select>
     </div>
 
-    <canvas id="barChart"></canvas>
+    <div class="chart-container-bar">
+        <canvas id="barChart"></canvas>
+    </div>
 </div>
 
+{{-- TABEL VERIFIKASI MILESTONE (NEW) --}}
+<div class="box" id="tabelVerifikasi">
+    <div class="box-header">
+        <h3>📝 Verifikasi Milestone Mahasiswa</h3>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge" style="background: #4e73df; color: white;">{{ $totalVerifikasiMilestones }} Menunggu</span>
+            <a href="{{ route('admin.verifikasi.milestone') }}" class="btn btn-outline-primary btn-sm" style="font-size: 11px; border-radius: 8px;">Lihat Semua</a>
+        </div>
+    </div>
+
+    <table class="table-custom">
+        <thead>
+            <tr>
+                <th>NIM</th>
+                <th>Nama</th>
+                <th>Milestone</th>
+                <th>Tgl Upload</th>
+                <th>Dokumen Bukti</th>
+                <th>Status</th>
+                <th>Detail</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($verifikasiMilestones as $m)
+            @php
+                $ta = $m->tugasAkhir;
+                $mhs = $ta ? $ta->mahasiswa : null;
+            @endphp
+            <tr>
+                <td>{{ $mhs->nim ?? '-' }}</td>
+                <td style="text-align: left;">{{ $mhs->user->name ?? '-' }}</td>
+                <td>{{ $m->jenis_milestone }}</td>
+                <td>{{ $m->tanggal_upload ? \Carbon\Carbon::parse($m->tanggal_upload)->format('d M Y') : '-' }}</td>
+                <td>
+                    @if(is_array($m->file_path))
+                        @foreach($m->file_path as $key => $path)
+                            <a href="{{ asset('storage/' . $path) }}" target="_blank" class="badge-proof">
+                                <i class="fas fa-file-lines"></i> {{ is_numeric($key) ? 'Bukti ' . ($key + 1) : ucfirst(str_replace('_', ' ', $key)) }}
+                            </a>
+                        @endforeach
+                    @elseif($m->file_path)
+                        <a href="{{ asset('storage/' . $m->file_path) }}" target="_blank" class="badge-proof">
+                            <i class="fas fa-file-lines"></i> Bukti
+                        </a>
+                    @else
+                        <span class="text-muted" style="font-size: 11px;">Belum upload</span>
+                    @endif
+                </td>
+                <td><span class="status-badge waiting">Menunggu</span></td>
+                <td>
+                    <a href="{{ route('admin.detail-mahasiswa', $mhs->id) }}" class="btn-icon btn-view">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="7" style="text-align: center; color: #999; padding: 20px;">Tidak ada verifikasi menunggu.</td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+{{-- TABEL VERIFIKASI BUKTI BIMBINGAN (NEW) --}}
+<div class="box" id="tabelVerifikasiBimbingan">
+    <div class="box-header">
+        <h3>📑 Verifikasi Bukti Bimbingan Mahasiswa</h3>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge" style="background: #1cc88a; color: white;">{{ $totalVerifikasiBimbingans }} Menunggu</span>
+            <a href="{{ route('admin.verifikasi.bimbingan') }}" class="btn btn-outline-success btn-sm" style="font-size: 11px; border-radius: 8px;">Lihat Semua</a>
+        </div>
+    </div>
+
+    <table class="table-custom">
+        <thead>
+            <tr>
+                <th>Mahasiswa</th>
+                <th>Jadwal Bimbingan</th>
+                <th>Catatan Mahasiswa</th>
+                <th>Berkas Bukti</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($verifikasiBimbingans as $vb)
+            <tr>
+                <td style="text-align: left;">{{ $vb->tugasAkhir->mahasiswa->user->name }}</td>
+                <td>{{ \Carbon\Carbon::parse($vb->tanggal)->format('d M Y') }} ({{ $vb->waktu ?? '-' }})</td>
+                <td style="text-align: left;">{{ Str::limit($vb->catatan_mahasiswa ?? $vb->deskripsi, 50) }}</td>
+                <td>
+                    @if($vb->file_dokumen)
+                        <a href="{{ asset('storage/'.$vb->file_dokumen) }}" target="_blank" class="badge bg-secondary text-decoration-none">
+                            📄 Lihat File
+                        </a>
+                    @else - @endif
+                </td>
+                <td>
+
+                    <a href="{{ route('admin.detail-mahasiswa', $vb->tugasAkhir->mahasiswa->id) }}" class="btn-icon btn-acc" title="Lihat Profil" style="background:#4e73df; color:white; display:inline-flex;">
+                        <i class="fas fa-user"></i>
+                    </a>
+                </td>
+            </tr>
+            @empty
+            <tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">Belum ada bukti bimbingan masuk.</td></tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+{{-- TABEL UPLOAD BAP (NEW) --}}
+<div class="box mt-4" id="tabelUploadBap">
+    <div class="box-header">
+        <h3>📄 Upload BAP Milestone</h3>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge" style="background: #f6c23e; color: black;">{{ $bapPendingCount }} Belum Diunggah</span>
+            <a href="{{ route('admin.verifikasi.bap') }}" class="btn btn-outline-warning btn-sm" style="font-size: 11px; border-radius: 8px; color: #856404; border-color: #f6c23e;">Lihat Semua</a>
+        </div>
+    </div>
+
+    <table class="table-custom">
+        <thead>
+            <tr>
+                <th>NIM</th>
+                <th>Nama Mahasiswa</th>
+                <th>Jenis Milestone</th>
+                <th>Tgl Disetujui</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($bapPending as $m)
+            <tr>
+                <td>{{ $m->tugasAkhir->mahasiswa->nim }}</td>
+                <td style="text-align: left;">{{ $m->tugasAkhir->mahasiswa->user->name }}</td>
+                <td>{{ $m->jenis_milestone }}</td>
+                <td>{{ \Carbon\Carbon::parse($m->tanggal_disetujui)->format('d M Y') }}</td>
+                <td>
+                    <button class="btn-icon btn-acc" style="background:#198754;" title="Upload BAP" 
+                        onclick="openUploadBapModal({{ $m->id }}, '{{ $m->jenis_milestone }}', '{{ addslashes($m->tugasAkhir->mahasiswa->user->name) }}')">
+                        <i class="fas fa-upload"></i>
+                    </button>
+                </td>
+            </tr>
+            @empty
+            <tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">Semua BAP sudah terunggah atau belum ada milestone yang disetujui.</td></tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+@push('modals')
+{{-- Modal Upload BAP --}}
+<div class="modal fade" id="uploadBapModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="" id="formUploadBap" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload BAP Milestone</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <p>Mahasiswa: <strong id="bap-mhs-name"></strong></p>
+                        <p>Milestone: <strong id="bap-milestone-name"></strong></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">File BAP (PDF)</label>
+                        <input type="file" name="file_bap" class="form-control" accept=".pdf" required>
+                        <small class="text-muted">Maksimal 4MB. Format: .pdf</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan & Upload</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@endpush
+
+@push('scripts')
+<script>
+function openUploadBapModal(id, milestone, name) {
+    const form = document.getElementById('formUploadBap');
+    form.action = "{{ url('/admin/upload-bap') }}/" + id;
+    document.getElementById('bap-mhs-name').innerText = name;
+    document.getElementById('bap-milestone-name').innerText = milestone;
+    
+    const modal = new bootstrap.Modal(document.getElementById('uploadBapModal'));
+    modal.show();
+}
+</script>
+@endpush
 
 @endsection
 
 @push('scripts')
 <style>
-.main {
-    background: #f4f6fb;
-    padding: 30px;
-}
 
 .topbar {
     display: flex;
@@ -117,7 +366,7 @@
 
 .cards {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
 }
@@ -132,7 +381,7 @@
 .blue { background: #02048d; }
 .green { background: #00a806; }
 .yellow { background: #f6c23e; color: #000; }
-.red { background: #ff1500; }
+.red { background: #e91603; }
 
 .card h2 {
     font-size: 28px;
@@ -158,26 +407,6 @@
     border-radius: 8px;
     border: 1px solid #ccc;
 }
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-table th, table td {
-    padding: 12px;
-    font-size: 14px;
-}
-
-table thead {
-    background: #f1f2f6;
-}
-
-table tbody tr {
-    border-bottom: 1px solid #eee;
-}
-
 .aksi button {
     border: none;
     padding: 8px 10px;
@@ -233,20 +462,128 @@ table tbody tr {
 }
 
 /* variant warning */
-.warning .highlight-number {
+.warning .highlight-number,
+.warning-num {
     background: #fde8e8;
     color: #e74a3b;
 }
 
+.info .highlight-number,
+.info-num {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.warning {
+    border-left: 3px solid #e74a3b;
+}
+
+.info {
+    border-left: 3px solid #0369a1;
+}
+
+.danger-alert {
+    border-left: 3px solid #dc3545;
+}
+
+.danger-num {
+    background: #fee2e2;
+    color: #dc3545;
+}
+
+.badge-proof {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f1f5f9;
+    color: #475569;
+    padding: 5px 10px;
+    border-radius: 8px;
+    text-decoration: none !important;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.2s;
+    margin: 2px;
+    border: 1px solid #e2e8f0;
+}
+
+.badge-proof:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+    transform: translateY(-1px);
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    transition: all 0.2s;
+    text-decoration: none !important;
+}
+
+.btn-icon:hover {
+    transform: scale(1.1);
+}
+
+.btn-view {
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.btn-view:hover {
+    background: #4f46e5;
+    color: white;
+}
+
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.table-custom th {
+    background: #f8f9fc;
+    padding: 12px;
+    font-size: 13px;
+    color: #6c757d;
+    font-weight: 600;
+    text-align: center;
+}
+
+.table-custom td {
+    padding: 12px;
+    border-top: 1px solid #eee;
+    font-size: 13px;
+    text-align: center;
+}
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-badge.waiting {
+    background: #fffbeb;
+    color: #b45309;
+}
+
 .clickable-card {
-    text-decoration: none; /* ⬅️ ini yang ngilangin garis bawah */
+    text-decoration: none;
     color: inherit;
     cursor: pointer;
     transition: all .18s ease;
 }
 
-/* penting juga untuk state hover & visited */
-.clickable-card:hover,
+.clickable-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1) !important;
+}
+
 .clickable-card:focus,
 .clickable-card:visited {
     text-decoration: none;
@@ -254,75 +591,140 @@ table tbody tr {
 }
 .kritis-wrapper {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 25px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
 }
 
 .kritis-card {
-    background: white;
-    border-radius: 16px;
-    padding: 22px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-    transition: 0.25s ease;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-decoration: none !important;
+}
+
+.kritis-card.top-row {
+    grid-column: span 3;
+    padding: 20px 28px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.kritis-card.top-row .kritis-value {
+    margin-bottom: 0;
+    font-size: 36px;
+}
+
+.kritis-card.top-row .kritis-header {
+    margin-bottom: 0;
+    flex-direction: row;
+    gap: 12px;
+}
+
+.kritis-card.bottom-row {
+    grid-column: span 2;
 }
 
 .kritis-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    border-color: rgba(203, 213, 225, 1);
 }
 
-/* 🔥 CARD KRITIS SUPER MENCOLOK */
 .kritis-card.highlight {
-    background: linear-gradient(135deg, #fff5f5, #ffeaea);
-    border: 1px solid #ffd6d6;
-    box-shadow: 0 8px 24px rgba(231, 76, 60, 0.15);
+    background: linear-gradient(180deg, #ffffff 0%, #fffafa 100%);
+    border: 1px solid #fee2e2;
 }
 
 .kritis-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.kritis-icon {
-    font-size: 18px;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 .kritis-title {
-    font-size: 14px;
-    color: #666;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .kritis-value {
-    font-size: 36px;
+    font-size: 42px;
     font-weight: 800;
-    margin-bottom: 6px;
-    color: #222;
+    line-height: 1;
+    margin-bottom: 12px;
+    color: #1e293b;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.kritis-value::after {
+    content: 'mahasiswa';
+    font-size: 13px;
+    font-weight: 500;
+    color: #94a3b8;
+    text-transform: lowercase;
 }
 
 .kritis-desc {
     font-size: 13px;
-    color: #888;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: inline-block;
+    width: fit-content;
 }
 
-/* accent line */
-.kritis-card.danger {
-    border-left: 5px solid #e74c3c;
+.kritis-card.danger .kritis-desc { background: #fef2f2; color: #dc2626; }
+.kritis-card.warning .kritis-desc { background: #fffbeb; color: #d97706; }
+.kritis-card.success .kritis-desc { background: #ecfdf5; color: #059669; }
+.kritis-card.info .kritis-desc { background: #f0f9ff; color: #0284c7; }
+
+/* Decorative Circle */
+.kritis-card::after {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: currentColor;
+    border-radius: 50%;
+    bottom: -40px;
+    right: -40px;
+    opacity: 0.03;
 }
 
-.kritis-card.warning {
-    border-left: 5px solid #f39c12;
-}
-
-.kritis-card.success {
-    border-left: 5px solid #27ae60;
-}
 #filterAngkatanPie {
     padding: 6px 10px;
     border-radius: 8px;
     border: 1px solid #ccc;
+}
+.chart-container-pie {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.chart-container-bar {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+.table-custom tbody tr {
+    cursor: pointer;
 }
 </style>
 @endpush
@@ -330,163 +732,194 @@ table tbody tr {
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // Data from Controller
+    const statsByYear = @json($statsByYear);
+    const globalMilestoneStats = @json($milestoneStats);
+    const globalAhead = {{ $ahead }};
+    const globalIdeal = {{ $ideal }};
+    const globalBehind = {{ $behind }};
 
-    const dataPerTahun = {
-        2021: {
-            belum: [30,25,20,15,10,8,5,3,2,1,0],
-            sudah: [0,5,10,15,20,22,25,27,28,29,30]
-        },
-        2022: {
-            belum: [40,30,25,18,12,10,6,4,3,2,1],
-            sudah: [0,10,15,22,28,30,34,36,37,38,39]
-        },
-        2023: {
-            belum: [50,45,35,25,15,12,8,5,3,2,1],
-            sudah: [0,5,15,25,35,38,42,45,47,48,49]
-        }
-    };
-
-    const ctx1 = document.getElementById('barChart');
-
-    let chart = new Chart(ctx1, {
+    // --- BAR CHART (Sebaran Milestone) ---
+    const ctxBar = document.getElementById('barChart');
+    const barChart = new Chart(ctxBar, {
         type: 'bar',
         data: {
-            labels: [
-                'Penetapan Komisi',
-                'Sidang Komisi 1',
-                'Kolokium',
-                'Proposal',
-                'Penelitian',
-                'Evaluasi',
-                'Sidang Komisi 2',
-                'Seminar',
-                'Publikasi',
-                'Ujian Tesis',
-                'SKL'
-            ],
+            labels: Object.keys(globalMilestoneStats),
             datasets: [
-                {
-                    label: 'Belum',
-                    data: dataPerTahun[2021].belum,
-                    backgroundColor: '#4e73df'
+                { 
+                    label: 'Belum', 
+                    data: Object.values(globalMilestoneStats).map(s => s.belum), 
+                    backgroundColor: '#f3f4f6', // Light gray/slate
+                    borderColor: '#94a3b8',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    hoverBackgroundColor: '#e5e7eb'
                 },
-                {
-                    label: 'Sudah',
-                    data: dataPerTahun[2021].sudah,
-                    backgroundColor: '#f6c23e'
+                { 
+                    label: 'Sudah', 
+                    data: Object.values(globalMilestoneStats).map(s => s.sudah), 
+                    backgroundColor: '#10b981', // Emerald
+                    borderColor: '#059669',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    hoverBackgroundColor: '#059669'
                 }
             ]
         },
         options: {
             responsive: true,
-            scales: {
-                x: { stacked: true },
-                y: { stacked: true }
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { 
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: { family: "'Inter', sans-serif", size: 12, weight: '500' }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                    padding: 12,
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 13 },
+                    cornerRadius: 8,
+                    displayColors: true
+                }
+            },
+            scales: { 
+                x: { 
+                    grid: { display: false },
+                    ticks: { font: { family: "'Inter', sans-serif", weight: '500' } }
+                }, 
+                y: { 
+                    beginAtZero: true,
+                    grid: { color: '#f1f5f9' },
+                    ticks: { 
+                        stepSize: 1,
+                        font: { family: "'Inter', sans-serif" }
+                    }
+                } 
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
             }
         }
     });
 
-    document.getElementById('filterTahun')
-    .addEventListener('change', function () {
-
-        let tahun = this.value;
-
-        chart.data.datasets[0].data = dataPerTahun[tahun].belum;
-        chart.data.datasets[1].data = dataPerTahun[tahun].sudah;
-
-        chart.update();
-    });
-
-    const ctx2 = document.getElementById('lineChart');
-
-    new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-            datasets: [{
-                label: 'Bimbingan',
-                data: [5,18,25,6,17,26,13,7,18,6,18,25],
-                backgroundColor: '#9b59b6'
-            }]
-        }
-    });
-
-});
-
-function openModal(id) {
-    document.getElementById(id).style.display = "flex";
-}
-
-function closeModal(id) {
-    document.getElementById(id).style.display = "none";
-}
-
-/* optional: klik luar modal untuk close */
-window.addEventListener('click', function(e) {
-    const modal = document.getElementById('logModal');
-    if (e.target === modal) {
-        modal.style.display = 'none';
-    }
-});
-
-// pie chart
-document.addEventListener("DOMContentLoaded", function() {
-
-    // 🔥 dummy data per angkatan
-    const statusPerAngkatan = {
-        2021: [40, 10, 25, 5],
-        2022: [30, 15, 35, 8],
-        2023: [20, 12, 45, 10]
-    };
-
-    const ctxStatus = document.getElementById('statusChart');
-
-    let statusChart = new Chart(ctxStatus, {
+    // --- PIE CHART (Status Masa Studi) ---
+    const ctxPie = document.getElementById('statusChart');
+    const statusChart = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
             labels: [
                 'Tepat Waktu',
-                'Tidak Tepat Waktu',
-                'Dalam Proses',
-                'Terancam DO'
+                'Tidak Tepat Waktu'
             ],
             datasets: [{
-                data: statusPerAngkatan[2021],
-                backgroundColor: [
-                    '#00a806',
-                    '#ff1500',
-                    '#f6c23e',
-                    '#6c757d'
-                ]
+                data: [{{ $groupTepatWaktuCount }}, {{ $groupTidakTepatWaktuCount }}],
+                backgroundColor: ['#1cc88a', '#e74a3b'],
+                borderWidth: 2,
+                borderColor: '#fff'
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: 'bottom'
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+                            const pct = total ? Math.round(ctx.parsed/total*100) : 0;
+                            return ` ${ctx.label}: ${ctx.parsed} mahasiswa (${pct}%)`;
+                        }
+                    }
                 }
             },
-            cutout: '65%'
+            cutout: '70%'
         }
     });
 
-    // 🔥 filter dropdown
-    document
-        .getElementById('filterAngkatanPie')
-        .addEventListener('change', function () {
+    // --- BIMBINGAN TREND CHART ---
+    const ctxTrend = document.getElementById('bimbinganTrendChart');
+    new Chart(ctxTrend, {
+        type: 'line',
+        data: {
+            labels: @json(collect($chartBimbingan)->pluck('month')),
+            datasets: [
+                {
+                    label: 'Rencana',
+                    data: @json(collect($chartBimbingan)->pluck('planned')),
+                    borderColor: '#4e73df',
+                    backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'Terlaksana',
+                    data: @json(collect($chartBimbingan)->pluck('completed')),
+                    borderColor: '#1cc88a',
+                    backgroundColor: 'transparent',
+                    fill: false,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+    });
 
-            let tahun = this.value;
+    // --- FILTER LOGIC ---
+    document.getElementById('filterAngkatanPie').addEventListener('change', function() {
+        const year = this.value;
+        let data = [{{ $groupTepatWaktuCount }}, {{ $groupTidakTepatWaktuCount }}];
+        
+        if (year !== 'all' && statsByYear[year]) {
+            data = [
+                statsByYear[year].tepat_waktu,
+                statsByYear[year].tidak_tepat_waktu
+            ];
+        }
+        
+        statusChart.data.datasets[0].data = data;
+        statusChart.update();
+    });
 
-            statusChart.data.datasets[0].data =
-                statusPerAngkatan[tahun];
+    document.getElementById('filterTahun').addEventListener('change', function() {
+        const year = this.value;
+        let pLabels = Object.keys(globalMilestoneStats);
+        let pSudah = Object.values(globalMilestoneStats).map(s => s.sudah);
+        let pBelum = Object.values(globalMilestoneStats).map(s => s.belum);
 
-            statusChart.update();
-        });
+        if (year !== 'all' && statsByYear[year]) {
+            const mData = statsByYear[year].milestones;
+            pSudah = pLabels.map(lbl => mData[lbl] ? mData[lbl].sudah : 0);
+            pBelum = pLabels.map(lbl => mData[lbl] ? mData[lbl].belum : 0);
+        }
 
+        barChart.data.datasets[0].data = pBelum;
+        barChart.data.datasets[1].data = pSudah;
+        barChart.update();
+    });
 });
+
+
+function openModal(id) {
+    document.getElementById(id).style.display = "flex";
+}
+function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+}
 </script>
 @endpush
 

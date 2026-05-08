@@ -1,273 +1,77 @@
 @extends('layouts.dosen')
 
-@section('title', 'Behind Mahasiswa')
+@section('title', 'Mahasiswa Behind')
 
 @section('page-content')
-
 <div class="main">
-
-    <h1>Daftar Mahasiswa</h1>
-
-    <!-- Statistik -->
-    <div class="stat-card stat-red">
-        <h2>30</h2>
-        <p>Mahasiswa Bimbingan Aktif</p>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ route('dosen.dashboard') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <h2 class="mb-0">Mahasiswa Behind 🔴</h2>
     </div>
 
-    <div class="table-tools">
-        <input type="text" id="searchInput" placeholder="🔍 Cari nama mahasiswa...">
-        <select id="sortTahun">
-            <option value="">Semua Tahun</option>
-            <option value="2020/2021">2020/2021</option>
-            <option value="2021/2022">2021/2022</option>
-            <option value="2022/2023">2022/2023</option>
-            <option value="2023/2024">2023/2024</option>
-        </select>
-        <select id="sortSemester">
-            <option value="">Semua Semester</option>
-            <option value="1">Semester 1</option>
-            <option value="2">Semester 2</option>
-            <option value="3">Semester 3</option>
-            <option value="4">Semester 4</option>
-            <option value="5">Semester 5</option>
-            <option value="6">Semester 6</option>
-            <option value="7">Semester 7</option>
-            <option value="8">Semester 8</option>
-        </select>
-        <select id="sortPeran">
-            <option value="">Peran Semua</option>
-            <option value="P1">Pembimbing 1</option>
-            <option value="P2">Pembimbing 2</option>
-        </select>
+    <div class="stat-card stat-red mb-4">
+        <h2>{{ $mahasiswas->count() }}</h2>
+        <p>Mahasiswa progres di bawah target</p>
     </div>
 
-    <!-- Tabel -->
     <div class="card">
-        <table id="tabelMahasiswa">
+        <table>
             <thead>
                 <tr>
-                    <th>No</th>
-                    <th>Tahun Masuk</th>
-                    <th>NIM</th>
-                    <th>Nama</th>
-                    <th>Semester</th>
-                    <th>Milestone Terakhir</th>
-                    <th>Aksi</th>
+                    <th>No</th><th>NIM</th><th>Nama</th><th>Peran</th>
+                    <th>Milestone Terakhir</th><th>Alasan Behind</th><th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
+                @forelse($mahasiswas as $i => $mhs)
+                @php
+                    $isP1  = $mhs->pembimbing1_id == $dosen->id;
+                    $lastB = $mhs->last_bimbingan ?? null;
+                    $active = $mhs->active_milestone ?? null;
+                    $now   = \Carbon\Carbon::now();
+
+                    $alasan = [];
+                    if (!$lastB || $now->diffInDays(\Carbon\Carbon::parse($lastB->tanggal)) > 30) {
+                        $hari = $lastB ? (int) $now->diffInDays(\Carbon\Carbon::parse($lastB->tanggal)) : null;
+                        $alasan[] = $hari ? "Tidak bimbingan {$hari} hari" : 'Belum pernah bimbingan';
+                    }
+                    $latestMs = $mhs->tugasAkhir?->milestones->sortByDesc('created_at')->first();
+                    if (!$latestMs || $now->diffInDays(\Carbon\Carbon::parse($latestMs->created_at)) > 30) {
+                        $alasan[] = 'Tidak daftar milestone > 30 hari';
+                    }
+                    if ($active && $active->deadline && \Carbon\Carbon::parse($active->deadline)->lt($now)
+                        && empty($active->file_path)) {
+                        $alasan[] = 'Deadline "' . $active->jenis_milestone . '" terlewat';
+                    }
+                @endphp
                 <tr>
-                    <td>1</td>
-                    <td>2020/2021</td>
-                    <td>J0403221143</td>
+                    <td>{{ $i + 1 }}</td>
+                    <td>{{ $mhs->nim }}</td>
+                    <td style="text-align:left">{{ $mhs->user->name ?? '-' }}</td>
+                    <td><span class="role-badge {{ $isP1 ? 'p1':'p2' }}">{{ $isP1 ? 'P1':'P2' }}</span></td>
                     <td>
-                        <span class="role-badge p1">P1</span>
-                        Dini Nurul Azizah</td>
-                    <td>4</td>
-                    <td>
-                        <span class="badge badge-red">
-                            Penetapan Komisi Pembimbing
-                        </span>
+                        @if($mhs->last_milestone ?? null)
+                            <span class="badge-ms">{{ $mhs->last_milestone->jenis_milestone }}</span>
+                        @else <span style="color:#aaa">-</span> @endif
                     </td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view">
+                    <td style="text-align:left">
+                        @foreach($alasan as $a)
+                            <span class="danger-badge d-block mb-1">⚠ {{ $a }}</span>
+                        @endforeach
+                        @if(empty($alasan)) <span style="color:#aaa">-</span> @endif
+                    </td>
+                    <td>
+                        <a href="{{ route('dosen.detail_mahasiswa', $mhs->id) }}" class="btn-icon btn-view">
                             <i class="fas fa-eye"></i>
-                        </button>
-                        <!-- Remind -->
-                        <button class="btn-icon btn-alert">
-                            <i class="fas fa-bell"></i>
-                        </button>
+                        </a>
                     </td>
                 </tr>
+                @empty
+                <tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">Tidak ada mahasiswa behind.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>
-
 </div>
-
-<style>
-    .main {
-    padding: 30px;
-}
-
-.stat-card {
-    color: white;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
-
-.stat-red {
-    background: #ff1500;
-}
-
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-table th, table td {
-    padding: 14px;
-    text-align: center;
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-table thead {
-    background: #f1f2f6;
-}
-
-table tbody tr {
-    border-bottom: 1px solid #eee;
-}
-
-td:nth-child(4) {
-    max-width: 200px;
-    word-break: break-word;
-}
-
-/* Kolom milestone */
-td:nth-child(6) {
-    max-width: 220px;
-}
-
-table td:nth-child(4)  {
-    text-align: left;
-}
-
-
-td {
-    word-break: break-word;
-}
-
-.badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    display: inline-block;
-    color: white;
-}
-
-.badge-red {
-    background: #ff1500;
-}
-
-.btn-icon {
-    border: none;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-/* Warna */
-.btn-view {
-    background: #0dcaf0;
-}
-
-.btn-alert {
-    background: #f39c12;
-    color: white;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 2px;          /* jarak antar tombol */
-    justify-content: center; /* kalau mau di tengah */
-    align-items: center;
-}
-
-.table-tools {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 15px;
-}
-
-.table-tools input,
-.table-tools select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.role-badge {
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    margin-left: 6px;
-    font-weight: 600;
-}
-
-.role-badge.p1 {
-    background: #e8f0ff;
-    color: #3b4cca;
-}
-
-.role-badge.p2 {
-    background: #e6f4ea;
-    color: #1cc88a;
-}
-
-</style>
-
+@include('dosen._table-styles')
 @endsection
-
-@push('scripts')
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    document.getElementById("searchInput").addEventListener("keyup", filterTable);
-    document.getElementById("sortSemester").addEventListener("change", filterTable);
-    document.getElementById("sortTahun").addEventListener("change", filterTable);
-    document.getElementById("sortPeran").addEventListener("change", filterTable);
-
-    function filterTable() {
-
-        let search = document.getElementById("searchInput").value.toLowerCase();
-        let semester = document.getElementById("sortSemester").value;
-        let tahun = document.getElementById("sortTahun").value;
-        let peran = document.getElementById("sortPeran").value;
-
-        let rows = document.querySelectorAll("#tabelMahasiswa tbody tr");
-
-        rows.forEach(row => {
-
-            let nama = row.cells[3].innerText.toLowerCase();
-            let rowSemester = row.cells[4].innerText.trim();
-            let rowTahun = row.cells[1].innerText.trim();
-
-            // 🔥 ambil dari badge
-            let badge = row.querySelector(".role-badge");
-            let rowPeran = badge ? badge.innerText.trim() : "";
-
-            let show = true;
-
-            if (search && !nama.includes(search)) show = false;
-            if (semester && rowSemester !== semester) show = false;
-            if (tahun && rowTahun !== tahun) show = false;
-            if (peran && rowPeran !== peran) show = false;
-
-            row.style.display = show ? "" : "none";
-        });
-    }
-
-});
-</script>
-@endpush

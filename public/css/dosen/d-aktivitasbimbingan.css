@@ -1,0 +1,80 @@
+/* Aktivitas Bimbingan specific styles - Restored to original design */
+
+.badge-danger {
+    background: #ffe5e5;
+    color: #e74a3b;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.badge-success {
+    background: #e6f4ea;
+    color: #1cc88a;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+/* TABLE Aktivitas Bimbingan specific */
+.table-custom th {
+    padding: 10px;
+    text-align: left;
+}
+
+.table-custom td {
+    padding: 10px;
+    overflow-wrap: break-word;
+    white-space: normal;
+    vertical-align: top;
+}
+
+table tbody tr:hover td {
+    background-color: #f8f9fc;
+}
+
+/* tombol ingatkan */
+.btn-remind {
+    border: none;
+    background: #ff0000;
+    color: white;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.btn-remind:hover {
+    background: #e60000;
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.btn-view-log {
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: #36b9cc;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-view-log:hover {
+    background: #2c9faf;
+}
+
+/* ====== LOCK COLUMN WIDTH ====== */
+.table-custom th:nth-child(1), .table-custom td:nth-child(1) { width: 110px; }
+.table-custom th:nth-child(2), .table-custom td:nth-child(2) { width: 200px; }
+.table-custom th:nth-child(3), .table-custom td:nth-child(3) { width: 150px; }
+.table-custom th:nth-child(4), .table-custom td:nth-child(4) { width: 160px; }
+.table-custom th:nth-child(5), .table-custom td:nth-child(5) { width: 150px; }
+.table-custom th:nth-child(6), .table-custom td:nth-child(6) { width: 120px; }
+.table-custom th:nth-child(7), .table-custom td:nth-child(7) { width: 130px; }

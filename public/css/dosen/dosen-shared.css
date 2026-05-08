@@ -1,0 +1,236 @@
+/* Shared styles for Dosen Dashboard and related pages - Refined to maintain original design */
+
+.page-wrapper {
+    padding: 24px;
+}
+
+.page-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Card Box Container */
+.card-box {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    border: 1px solid #f1f1f1;
+    overflow-x: auto;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+/* Tables Base */
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.table-custom th {
+    background: #f8f9fc;
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.table-custom td {
+    border-top: 1px solid #eee;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.waiting {
+    background: #fff4e5;
+    color: #f6a500;
+}
+
+.approved, .valid {
+    background: #e6f7ee;
+    color: #1cc88a;
+}
+
+.verify {
+    background: #e7f1ff;
+    color: #4e73df;
+}
+
+.done {
+    background: #e6f7ee;
+    color: #1cc88a;
+}
+
+.pending {
+    background: #fde8e8;
+    color: #e74a3b;
+}
+
+/* Role Badges */
+.role-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    margin-left: 6px;
+    font-weight: 600;
+}
+
+.role-badge.p1 { background: #e8f0ff; color: #3b4cca; }
+.role-badge.p2 { background: #e6f4ea; color: #1cc88a; }
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-icon {
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: 0.2s;
+    text-decoration: none;
+}
+
+.btn-view  { background: #0dcaf0; }
+.btn-approve { background: #198754; }
+.btn-reject  { background: #dc3545; }
+
+.btn-icon:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+/* Modals */
+.modal-log {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-content-log {
+    background: white;
+    width: 540px;
+    max-width: 100%;
+    border-radius: 20px;
+    padding: 24px;
+    animation: fadeIn .25s ease;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    border: 1px solid #eef2f7;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.modal-header h4, .modal-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.close-modal, .btn-close {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.log-grid {
+    display: grid;
+    grid-template-columns: 140px 10px 1fr;
+    gap: 12px 14px;
+    font-size: 14px;
+    align-items: start;
+}
+
+.log-grid .value {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.log-grid .label {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.colon {
+    text-align: center;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.modal-footer-log {
+    text-align: right;
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.btn-close-log, .btn-cancel {
+    background: #858796;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-acc {
+    background: #1cc88a;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-reject-btn {
+    background: #e74a3b;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from {transform: scale(0.95); opacity: 0;}
+    to {transform: scale(1); opacity: 1;}
+}

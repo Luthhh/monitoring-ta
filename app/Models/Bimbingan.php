@@ -12,8 +12,21 @@ class Bimbingan extends Model
         'tugas_akhir_id',
         'dosen_id',
         'tanggal',
+        'waktu',
+        'tempat',
+        'deskripsi',
+        'hasil_bimbingan',
+        'catatan_mahasiswa',
         'catatan',
         'status',
+        'tahun_semester',
+        'nama_kegiatan',
+        'tanggal_selesai',
+        'durasi_jam',
+        'tipe_penyelenggaraan',
+        'nama_dokumen',
+        'file_dokumen',
+        'link_kegiatan',
     ];
 
     public function tugasAkhir()

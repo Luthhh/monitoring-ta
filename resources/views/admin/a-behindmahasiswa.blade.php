@@ -3,271 +3,137 @@
 @section('title', 'Behind Mahasiswa')
 
 @section('page-content')
-
 <div class="main">
-
-    <h1>Daftar Mahasiswa</h1>
-
-    <!-- Statistik -->
-    <div class="stat-card stat-red">
-        <h2>30</h2>
-        <p>Mahasiswa Bimbingan Aktif</p>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ route('admin.dashboard') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <h2 class="mb-0">Mahasiswa Behind 🔴</h2>
     </div>
 
-    <div class="table-tools">
-        <input type="text" id="searchInput" placeholder="🔍 Cari nama mahasiswa...">
-        <select id="sortTahun">
-            <option value="">Semua Tahun</option>
-            <option value="2020/2021">2020/2021</option>
-            <option value="2021/2022">2021/2022</option>
-            <option value="2022/2023">2022/2023</option>
-            <option value="2023/2024">2023/2024</option>
-        </select>
-        <select id="sortSemester">
-            <option value="">Semua Semester</option>
-            <option value="1">Semester 1</option>
-            <option value="2">Semester 2</option>
-            <option value="3">Semester 3</option>
-            <option value="4">Semester 4</option>
-            <option value="5">Semester 5</option>
-            <option value="6">Semester 6</option>
-            <option value="7">Semester 7</option>
-            <option value="8">Semester 8</option>
-        </select>
-        <select id="sortPeran">
-            <option value="">Peran Semua</option>
-            <option value="P1">Pembimbing 1</option>
-            <option value="P2">Pembimbing 2</option>
-        </select>
+    <div class="stat-card stat-red mb-4 d-flex align-items-center justify-content-between">
+        <div>
+            <p class="mb-1 opacity-75">Mahasiswa Progres di Bawah Target</p>
+            <h2 class="mb-0" style="font-size: 38px;">{{ $mahasiswas->count() }}</h2>
+        </div>
+        <i class="fas fa-user-xmark" style="font-size: 40px; opacity: 0.3;"></i>
     </div>
 
-    <!-- Tabel -->
-    <div class="card">
-        <table id="tabelMahasiswa">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Tahun Masuk</th>
-                    <th>NIM</th>
-                    <th>Nama</th>
-                    <th>Semester</th>
-                    <th>Milestone Terakhir</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>2020/2021</td>
-                    <td>J0403221143</td>
-                    <td>
-                        <span class="role-badge p1">P1</span>
-                        Dini Nurul Azizah</td>
-                    <td>4</td>
-                    <td>
-                        <span class="badge badge-red">
-                            Penetapan Komisi Pembimbing
-                        </span>
-                    </td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <!-- Remind -->
-                        <button class="btn-icon btn-alert">
-                            <i class="fas fa-bell"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="table-tools p-3 bg-white mb-4 shadow-sm" style="border-radius: 12px; border: 1px solid #f0f0f0;">
+        <div class="row g-3 w-100 align-items-center">
+            <div class="col-md-8">
+                <div class="position-relative">
+                    <i class="fas fa-search position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: #aaa;"></i>
+                    <input type="text" id="searchInput" class="form-control ps-5" placeholder="Cari nama atau NIM..." style="border-radius: 10px; border: 1px solid #e0e0e0; height: 42px;">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select id="sortTahun" class="form-select" style="border-radius: 10px; border: 1px solid #e0e0e0; height: 42px;">
+                    <option value="">Semua Tahun</option>
+                    @foreach($all_years as $tahun)
+                        <option value="{{ $tahun }}">{{ $tahun }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
     </div>
 
+    <div class="card p-0 overflow-hidden" style="border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+        <div class="table-responsive">
+            <table id="tabelMahasiswa" class="mb-0">
+                <thead style="background: #f8f9fa;">
+                    <tr>
+                        <th style="width: 50px;">No</th>
+                        <th>Tahun Masuk</th>
+                        <th>NIM</th>
+                        <th>Nama</th>
+                        <th>Milestone Terakhir</th>
+                        <th>Alasan Behind</th>
+                        <th style="width: 80px;">Detail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($mahasiswas as $mhs)
+                    @php
+                        $lastB  = $mhs->last_bimbingan ?? null;
+                        $lastM  = $mhs->last_milestone ?? null;
+                        $active = $mhs->active_milestone ?? null;
+                        $now    = \Carbon\Carbon::now();
+
+                        // Tentukan alasan behind
+                        $alasan = [];
+                        if (!$lastB || $now->diffInDays(\Carbon\Carbon::parse($lastB->tanggal)) > 30) {
+                            $hari = $lastB ? $now->diffInDays(\Carbon\Carbon::parse($lastB->tanggal)) : '??';
+                            $alasan[] = "Tidak bimbingan > 30 hari (" . ($hari ?? '-') . " hari)";
+                        }
+                        if ($active && $active->deadline && $now->greaterThan(\Carbon\Carbon::parse($active->deadline))) {
+                            $alasan[] = "Melewati deadline milestone";
+                        }
+                        if (!$active) {
+                            $alasan[] = "Belum daftar milestone baru";
+                        }
+                    @endphp
+                    <tr data-tahun="{{ $mhs->tahun_masuk }}">
+                        <td>{{ $loop->iteration }}</td>
+                        <td><span class="text-muted">{{ $mhs->angkatan_formatted }}</span></td>
+                        <td><strong>{{ $mhs->nim }}</strong></td>
+                        <td style="text-align:left">{{ $mhs->user->name ?? '-' }}</td>
+                        <td>
+                            @if($lastM)
+                                <span class="badge bg-light text-dark border" style="color: #475569 !important;">{{ $lastM->jenis_milestone }}</span>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                        </td>
+                        <td style="text-align:left">
+                            @foreach($alasan as $a)
+                                <div class="danger-badge d-block mb-1" style="background:#fff1f0; border:1px solid #ffa39e; color:#cf1322; padding:2px 8px; border-radius:6px; font-size:11px;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> {{ $a }}
+                                </div>
+                            @endforeach
+                            @if(empty($alasan)) <span class="text-muted">-</span> @endif
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ route('admin.detail-mahasiswa', $mhs->id) }}" class="btn-icon btn-view" title="Detail">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" style="text-align:center;color:#aaa;padding:40px">
+                            <i class="fas fa-check-circle mb-2" style="font-size: 24px; color: #52c41a;"></i><br>
+                            Bagus! Tidak ada mahasiswa dalam kategori behind.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<style>
-    .main {
-    padding: 30px;
-}
-
-.stat-card {
-    color: white;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
-
-.stat-red {
-    background: #ff1500;
-}
-
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-table th, table td {
-    padding: 14px;
-    text-align: center;
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-table thead {
-    background: #f1f2f6;
-}
-
-table tbody tr {
-    border-bottom: 1px solid #eee;
-}
-
-td:nth-child(4) {
-    max-width: 200px;
-    word-break: break-word;
-}
-
-/* Kolom milestone */
-td:nth-child(6) {
-    max-width: 220px;
-}
-
-table td:nth-child(4)  {
-    text-align: left;
-}
-
-
-td {
-    word-break: break-word;
-}
-
-.badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    display: inline-block;
-    color: white;
-}
-
-.badge-red {
-    background: #ff1500;
-}
-
-.btn-icon {
-    border: none;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-/* Warna */
-.btn-view {
-    background: #0dcaf0;
-}
-
-.btn-alert {
-    background: #f39c12;
-    color: white;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 2px;          /* jarak antar tombol */
-    justify-content: center; /* kalau mau di tengah */
-    align-items: center;
-}
-
-.table-tools {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 15px;
-}
-
-.table-tools input,
-.table-tools select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.role-badge {
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    margin-left: 6px;
-    font-weight: 600;
-}
-
-.role-badge.p1 {
-    background: #e8f0ff;
-    color: #3b4cca;
-}
-
-.role-badge.p2 {
-    background: #e6f4ea;
-    color: #1cc88a;
-}
-
-</style>
-
+@include('admin._table-styles', ['color' => 'red'])
 @endsection
 
 @push('scripts')
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    document.getElementById("searchInput").addEventListener("keyup", filterTable);
-    document.getElementById("sortSemester").addEventListener("change", filterTable);
-    document.getElementById("sortTahun").addEventListener("change", filterTable);
-    document.getElementById("sortPeran").addEventListener("change", filterTable);
-
-    function filterTable() {
-
-        let search = document.getElementById("searchInput").value.toLowerCase();
-        let semester = document.getElementById("sortSemester").value;
-        let tahun = document.getElementById("sortTahun").value;
-        let peran = document.getElementById("sortPeran").value;
-
-        let rows = document.querySelectorAll("#tabelMahasiswa tbody tr");
-
-        rows.forEach(row => {
-
-            let nama = row.cells[3].innerText.toLowerCase();
-            let rowSemester = row.cells[4].innerText.trim();
-            let rowTahun = row.cells[1].innerText.trim();
-
-            // 🔥 ambil dari badge
-            let badge = row.querySelector(".role-badge");
-            let rowPeran = badge ? badge.innerText.trim() : "";
-
+document.addEventListener('DOMContentLoaded', function() {
+    const s = document.getElementById('searchInput');
+    const t = document.getElementById('sortTahun');
+    [s, t].forEach(el => el?.addEventListener('input', filter));
+    function filter() {
+        const q = s.value.toLowerCase(), tahun = t.value;
+        document.querySelectorAll('#tabelMahasiswa tbody tr').forEach(row => {
+            const nama = (row.cells[3]?.innerText || '').toLowerCase();
+            const nim  = (row.cells[2]?.innerText || '').toLowerCase();
+            const rt   = row.getAttribute('data-tahun') || '';
             let show = true;
-
-            if (search && !nama.includes(search)) show = false;
-            if (semester && rowSemester !== semester) show = false;
-            if (tahun && rowTahun !== tahun) show = false;
-            if (peran && rowPeran !== peran) show = false;
-
-            row.style.display = show ? "" : "none";
+            if (q && !nama.includes(q) && !nim.includes(q)) show = false;
+            if (tahun && rt !== tahun) show = false;
+            row.style.display = show ? '' : 'none';
         });
     }
-
 });
 </script>
 @endpush

@@ -7,53 +7,18 @@
 <!-- Modal Log Bimbingan -->
 <div id="logModal" class="modal-log">
     <div class="modal-content-log">
-
         <div class="modal-header">
-            <h4>Detail Log Bimbingan</h4>
+            <h4>Detail Bimbingan</h4>
             <span class="close-modal" onclick="closeLogModal()">✖</span>
         </div>
-
         <div class="modal-body">
-
             <div class="log-grid">
-                <div class="label">NIM</div>
-                <div class="colon">:</div>
-                <div class="value">J0403221234</div>
-
-                <div class="label">Nama</div>
-                <div class="colon">:</div>
-                <div class="value">
-                    Diandra Puteri
-                    <span class="role-badge p1">P1</span>
-                </div>
-
-                <div class="label">Tanggal Pengajuan</div>
-                <div class="colon">:</div>
-                <div class="value">10 Feb 2025</div>
-
-                <div class="label">Tanggal Bimbingan</div>
-                <div class="colon">:</div>
-                <div class="value">15 Feb 2025</div>
-
-                <div class="label">Tempat</div>
-                <div class="colon">:</div>
-                <div class="value">Ruang Dosen</div>
-
-                <div class="label">Topik</div>
-                <div class="colon">:</div>
-                <div class="value">Revisi Proposal</div>
-
-                <div class="label">Bukti Bimbingan</div>
-                <div class="colon">:</div>
-                <div class="value">
-                    <button class="btn-proof">📄 Lihat Bukti</button>
-                </div>
-
-                <div class="label">Status Verifikasi</div>
-                <div class="colon">:</div>
-                <div class="value">
-                    <span class="status-badge done">Disetujui</span>
-                </div>
+                <div class="label">Nama Kegiatan</div><div class="colon">:</div><div class="value" id="log-kegiatan">-</div>
+                <div class="label">Rencana Bimbingan</div><div class="colon">:</div><div class="value" id="log-bimbingan">-</div>
+                <div class="label">Tipe</div><div class="colon">:</div><div class="value" id="log-tempat">-</div>
+                <div class="label">Durasi</div><div class="colon">:</div><div class="value" id="log-durasi">-</div>
+                <div class="label">Catatan Dosen</div><div class="colon">:</div><div class="value" id="log-topik">-</div>
+                <div class="label">Status</div><div class="colon">:</div><div class="value" id="log-status">-</div>
             </div>
         </div>
     </div>
@@ -66,7 +31,7 @@
     <div class="card-box">
         <div class="card-header">
             <span>🔔 Mahasiswa Tidak Bimbingan > 30 Hari</span>
-            <span class="badge-danger">2</span>
+            <span class="badge-danger">{{ $tidakBimbingan30->count() }}</span>
         </div>
 
         <table class="table-custom">
@@ -82,34 +47,36 @@
                 </tr>
             </thead>
             <tbody>
+                @forelse($tidakBimbingan30 as $mhs)
+                @php
+                    $roleLabel = ($mhs->pembimbing1_id == $dosen->id) ? 'P1' : 'P2';
+                    $roleClass = ($mhs->pembimbing1_id == $dosen->id) ? 'p1' : 'p2';
+                    $tglTerakhir = $mhs->last_bimbingan ? \Carbon\Carbon::parse($mhs->last_bimbingan->tanggal)->format('d M Y') : 'Belum Pernah';
+                    $milestoneActive = $mhs->active_milestone ? $mhs->active_milestone->jenis_milestone : '-';
+                    $targetDate = ($mhs->active_milestone && $mhs->active_milestone->deadline) ? \Carbon\Carbon::parse($mhs->active_milestone->deadline)->format('d M Y') : 'Belum Atur';
+                @endphp
                 <tr>
-                    <td>2021001</td>
+                    <td>{{ $mhs->nim }}</td>
                     <td>
-                        <span class="role-badge p1">P1</span>
-                        Andi Saputra
+                        <span class="role-badge {{ $roleClass }}">{{ $roleLabel }}</span>
+                        {{ $mhs->user->name }}
                     </td>
-                    <td>12 Des 2025</td>
-                    <td>Kolokium</td>
-                    <td>20 Feb 2025</td>
-                    <td><span class="status-badge done">Sudah</span></td>
-                    <td>
-                        <button class="btn-remind">Ingatkan</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2021003</td>
-                    <td>
-                        <span class="role-badge p2">P2</span>
-                        Rina Putri
-                    </td>
-                    <td>1 Des 2025</td>
-                    <td>Seminar</td>
-                    <td>20 Feb 2025</td>
+                    <td>{{ $tglTerakhir }}</td>
+                    <td>{{ $milestoneActive }}</td>
+                    <td>{{ $targetDate }}</td>
                     <td><span class="status-badge pending">Belum</span></td>
-                    <td>
-                    <button class="btn-remind">Ingatkan</button>
+                    <td onclick="event.stopPropagation();">
+                        <form action="{{ url('/dosen/kirim-pengingat/' . $mhs->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn-remind" title="Ingatkan Mahasiswa"><i class="fas fa-bell"></i></button>
+                        </form>
                     </td>
                 </tr>
+                @empty
+                <tr>
+                    <td colspan="7" class="text-center" style="font-weight: 500; padding:20px;">Semua mahasiswa secara aktif melakukan bimbingan.</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -118,7 +85,7 @@
     <div class="card-box">
         <div class="card-header">
             <span>📅 Bimbingan Bulan Ini</span>
-            <span class="badge-success">3</span>
+            <span class="badge-success">{{ $bimbinganBulanIniList->count() }}</span>
         </div>
 
         <table class="table-custom">
@@ -134,54 +101,50 @@
                 </tr>
             </thead>
             <tbody>
+                @forelse($bimbinganBulanIniList as $bim)
+                @php
+                    $mhs = $bim->tugasAkhir->mahasiswa;
+                    $roleLabel = ($mhs->pembimbing1_id == $dosen->id) ? 'P1' : 'P2';
+                    $roleClass = ($mhs->pembimbing1_id == $dosen->id) ? 'p1' : 'p2';
+                    $activeMilestone = $bim->tugasAkhir->milestones->whereIn('status', ['pending', 'menunggu_verifikasi'])->first();
+                    $msName = $activeMilestone ? $activeMilestone->jenis_milestone : '-';
+                    $targetDate = ($activeMilestone && $activeMilestone->deadline) ? \Carbon\Carbon::parse($activeMilestone->deadline)->format('d M Y') : 'Belum Atur';
+                    
+                    $logData = [
+                        'nim' => $mhs->nim ?? '-',
+                        'name' => $mhs->user->name ?? '-',
+                        'role' => $roleLabel,
+                        'roleClass' => $roleClass,
+                        'kegiatan' => $bim->nama_kegiatan ?? '-',
+                        'tgl_bimbingan' => \Carbon\Carbon::parse($bim->tanggal)->format('d M Y'),
+                        'tempat' => $bim->tipe_penyelenggaraan ?? '-',
+                        'durasi' => ($bim->durasi_jam ?? '-') . ' Jam',
+                        'topik' => $bim->catatan ?? '-',
+                        'dokumen' => $bim->file_dokumen ? asset('storage/' . $bim->file_dokumen) : null,
+                        'status' => ucfirst(str_replace('_', ' ', $bim->status))
+                    ];
+                @endphp
                 <tr>
-                    <td>2021002</td>
+                    <td>{{ $mhs->nim }}</td>
                     <td>
-                        <span class="role-badge p1">P1</span>
-                        Siti Rahma
+                        <span class="role-badge {{ $roleClass }}">{{ $roleLabel }}</span>
+                        {{ $mhs->user->name }}
                     </td>
-                    <td>5 Feb 2026</td>
-                    <td>Sidang Komisi 1</td>
-                    <td>20 Feb 2025</td>
+                    <td>{{ \Carbon\Carbon::parse($bim->tanggal)->format('d M Y') }}</td>
+                    <td>{{ $msName }}</td>
+                    <td>{{ $targetDate }}</td>
                     <td><span class="status-badge done">Sudah</span></td>
-                    <td>
-                        <button class="btn-view-log" onclick="openLogModal()">
-                            👁 View Log
+                    <td onclick="event.stopPropagation();">
+                        <button class="btn-view-log" data-log="{{ base64_encode(json_encode($logData)) }}" onclick="openLogModal(this)">
+                            👁 Detail
                         </button>
                     </td>
                 </tr>
+                @empty
                 <tr>
-                    <td>2748328</td>
-                    <td>
-                        <span class="role-badge p2">P2</span>
-                        Anindya
-                    </td>
-                    <td>10 Feb 2026</td>
-                    <td>Seminar</td>
-                    <td>20 Feb 2025</td>
-                    <td><span class="status-badge pending">Belum</span></td>
-                    <td>
-                        <button class="btn-view-log" onclick="openLogModal()">
-                            👁 View Log
-                        </button>
-                    </td>
+                    <td colspan="7" class="text-center" style="font-weight: 500; padding:20px;">Belum ada aktivitas bimbingan bulan ini.</td>
                 </tr>
-                <tr>
-                    <td>2387472</td>
-                    <td>
-                        <span class="role-badge p2">P2</span>
-                        Yasmin
-                    </td>
-                    <td>14 Feb 2026</td>
-                    <td>Kolokium</td>
-                    <td>20 Feb 2025</td>
-                    <td><span class="status-badge done">Sudah</span></td>
-                    <td>
-                        <button class="btn-view-log" onclick="openLogModal()">
-                            👁 View Log
-                        </button>
-                    </td>
-                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -190,311 +153,10 @@
 @endsection
 
 @push('styles')
-<style>
-/* scope biar aman */
-.page-wrapper {
-    padding: 24px;
-}
-
-.page-title {
-    font-size: 22px;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 20px;
-}
-
-/* CARD */
-.card-box {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 22px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-    border: 1px solid #f1f1f1;
-}
-
-/* HEADER */
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
-    margin-bottom: 14px;
-}
-
-/* BADGE */
-.badge-danger {
-    background: #ffe5e5;
-    color: #e74a3b;
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-weight: 600;
-}
-
-.badge-success {
-    background: #e6f4ea;
-    color: #1cc88a;
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-weight: 600;
-}
-
-/* TABLE */
-.table-custom {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.table-custom th {
-    background: #f8f9fc;
-    padding: 10px;
-    text-align: left;
-    font-size: 13px;
-    color: #6c757d;
-}
-
-.table-custom td {
-    padding: 10px;
-    border-top: 1px solid #eee;
-    font-size: 14px;
-}
-
-/* STATUS */
-.status {
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.status.warning {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.status.success {
-    background: #d1f2eb;
-    color: #0c6b58;
-}
-
-/* badge status */
-.status-badge {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    display: inline-block;
-}
-
-/* sudah = hijau */
-.status-badge.done {
-    background: #e6f7ee;
-    color: #1cc88a;
-}
-
-/* belum = merah */
-.status-badge.pending {
-    background: #fde8e8;
-    color: #e74a3b;
-}
-
-/* tombol ingatkan */
-.btn-remind {
-    border: none;
-    background: #ff0000;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-}
-
-.btn-remind:hover {
-    background: #ffd500;
-}
-
-.btn-view-log {
-    border: none;
-    padding: 6px 14px;
-    border-radius: 8px;
-    background: #36b9cc;
-    color: white;
-    font-size: 13px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-view-log:hover {
-    background: #2c9faf;
-}
-
-.modal-log {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(4px);
-    z-index: 999;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.modal-content-log {
-    background: white;
-    width: 540px;
-    max-width: 100%;
-    border-radius: 20px;
-    padding: 24px;
-    animation: fadeIn .25s ease;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-    border: 1px solid #eef2f7;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 18px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.modal-header h4 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1f2937;
-}
-
-.close-modal {
-    cursor: pointer;
-    font-size: 18px;
-}
-
-.log-grid {
-    display: grid;
-    grid-template-columns: 180px 10px 1fr;
-    gap: 12px 14px;
-    font-size: 14px;
-    align-items: start;
-}
-
-.colon {
-    text-align: center;
-    color: #6b7280;
-    font-weight: 600;
-}
-
-.modal-actions {
-    text-align: right;
-    margin-top: 20px;
-}
-
-@keyframes fadeIn {
-    from {transform: scale(0.95); opacity: 0;}
-    to {transform: scale(1); opacity: 1;}
-}
-.modal-footer-log {
-    text-align: right;
-    margin-top: 20px;
-}
-
-.btn-close-log {
-    background: #858796;
-    color: white;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.table-custom {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed; /* ⭐⭐⭐ INI KUNCI UTAMA */
-}
-
-.table-custom th,
-.table-custom td {
-    padding: 10px;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    white-space: normal; /* ⭐ penting */
-    vertical-align: top;
-}
-
-/* ====== LOCK COLUMN WIDTH ====== */
-
-.table-custom th:nth-child(1),
-.table-custom td:nth-child(1) {
-    width: 110px; /* NIM */
-}
-
-.table-custom th:nth-child(2),
-.table-custom td:nth-child(2) {
-    width: 200px; /* Nama */
-}
-
-.table-custom th:nth-child(3),
-.table-custom td:nth-child(3) {
-    width: 150px; /* Terakhir */
-}
-
-.table-custom th:nth-child(4),
-.table-custom td:nth-child(4) {
-    width: 160px; /* Milestone */
-}
-
-.table-custom th:nth-child(5),
-.table-custom td:nth-child(5) {
-    width: 150px; /* Target */
-}
-
-.table-custom th:nth-child(6),
-.table-custom td:nth-child(6) {
-    width: 120px; /* Status */
-}
-
-.table-custom th:nth-child(7),
-.table-custom td:nth-child(7) {
-    width: 130px; /* Aksi */
-}
-
-.role-badge {
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    margin-left: 6px;
-    font-weight: 600;
-}
-
-.role-badge.p1 {
-    background: #e8f0ff;
-    color: #3b4cca;
-}
-
-.role-badge.p2 {
-    background: #e6f4ea;
-    color: #1cc88a;
-}
-
-</style>
+    <link rel="stylesheet" href="{{ asset('css/dosen/dosen-shared.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dosen/d-aktivitasbimbingan.css') }}">
 @endpush
 
-<script>
-function openLogModal() {
-    document.getElementById('logModal').style.display = 'flex';
-}
-
-function closeLogModal() {
-    document.getElementById('logModal').style.display = 'none';
-}
-
-/* optional: klik luar modal untuk close */
-window.addEventListener('click', function(e) {
-    const modal = document.getElementById('logModal');
-    if (e.target === modal) {
-        modal.style.display = 'none';
-    }
-});
-</script>
+@push('scripts')
+    <script src="{{ asset('js/dosen/d-aktivitasbimbingan.js') }}"></script>
+@endpush

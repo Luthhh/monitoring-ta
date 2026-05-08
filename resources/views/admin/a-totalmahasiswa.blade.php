@@ -6,243 +6,116 @@
 
 <div class="main">
 
-    <h1>Daftar Mahasiswa</h1>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ route('admin.dashboard') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <h2 class="mb-0">Total Mahasiswa 🔵</h2>
+    </div>
 
     <!-- Statistik -->
-    <div class="stat-card stat-blue">
-        <h2>30</h2>
-        <p>Mahasiswa Bimbingan Aktif</p>
+    <div class="stat-card stat-blue mb-4 d-flex align-items-center justify-content-between">
+        <div>
+            <p class="mb-1 opacity-75">Total Mahasiswa Terdaftar</p>
+            <h2 class="mb-0" style="font-size: 38px;">{{ $mahasiswas->count() }}</h2>
+        </div>
+        <i class="fas fa-user-graduate" style="font-size: 40px; opacity: 0.3;"></i>
     </div>
 
-    <div class="table-tools">
-        <input type="text" id="searchInput" placeholder="🔍 Cari nama mahasiswa...">
-        <select id="sortTahun">
-            <option value="">Semua Tahun</option>
-            <option value="2020/2021">2020/2021</option>
-            <option value="2021/2022">2021/2022</option>
-            <option value="2022/2023">2022/2023</option>
-            <option value="2023/2024">2023/2024</option>
-        </select>
-        <select id="sortSemester">
-            <option value="">Semua Semester</option>
-            <option value="1">Semester 1</option>
-            <option value="2">Semester 2</option>
-            <option value="3">Semester 3</option>
-            <option value="4">Semester 4</option>
-            <option value="5">Semester 5</option>
-            <option value="6">Semester 6</option>
-            <option value="7">Semester 7</option>
-            <option value="8">Semester 8</option>
-        </select>
-        <select id="sortPeran">
-            <option value="">Peran Semua</option>
-            <option value="P1">Pembimbing 1</option>
-            <option value="P2">Pembimbing 2</option>
-        </select>
-    </div>
+    <form action="{{ route('admin.total-mahasiswa') }}" method="GET" class="table-tools p-3 bg-white mb-4 shadow-sm" id="filterForm" style="border-radius: 12px; border: 1px solid #f0f0f0;">
+        <div class="row g-3 w-100 align-items-center">
+            <div class="col-md-4">
+                <div class="position-relative">
+                    <i class="fas fa-search position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: #aaa;"></i>
+                    <input type="text" name="search" id="searchInput" class="form-control ps-5" placeholder="Cari nama atau NIM..." value="{{ request('search') }}" style="border-radius: 10px; border: 1px solid #e0e0e0; height: 42px;">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select name="tahun" id="sortTahun" class="form-select" style="border-radius: 10px; border: 1px solid #e0e0e0; height: 42px;">
+                    <option value="">Semua Tahun</option>
+                    @foreach($tahunMasukList as $tahun)
+                        <option value="{{ $tahun }}" {{ request('tahun') == $tahun ? 'selected' : '' }}>{{ $tahun }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="semester" id="sortSemester" class="form-select" style="border-radius: 10px; border: 1px solid #e0e0e0; height: 42px;">
+                    <option value="">Semua Semester</option>
+                    @for($i=1; $i<=8; $i++)
+                        <option value="{{ $i }}" {{ request('semester') == $i ? 'selected' : '' }}>Semester {{ $i }}</option>
+                    @endfor
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="dosen" id="sortDosen" class="form-select" style="border-radius: 10px; border: 1px solid #e0e0e0; height: 42px;">
+                    <option value="">Semua Dosen Pembimbing</option>
+                    @foreach($dosens as $d)
+                        <option value="{{ $d->user->name }}" {{ request('dosen') == $d->user->name ? 'selected' : '' }}>{{ $d->user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </form>
 
     <!-- Tabel -->
-    <div class="card">
-        <table id="tabelMahasiswa">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Tahun Masuk</th>
-                    <th>NIM</th>
-                    <th>Nama</th>
-                    <th>Semester</th>
-                    <th>Milestone Terakhir</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>2020/2021</td>
-                    <td>J0403221143</td>
-                    <td>
-                        <span class="role-badge p1">P1</span>
-                        Luthfi Dika Chandra
-                    </td>
-                    <td>3</td>
-                    <td>
-                        <span class="badge badge-blue">
-                            Penetapan Komisi Pembimbing
-                        </span>
-                    </td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>2020/2021</td>
-                    <td>J0403221143</td>
-                    <td>
-                        <span class="role-badge p2">P2</span>
-                        Dini Nurul Azizah
-                    </td>
-                    <td>4</td>
-                    <td>
-                        <span class="badge badge-blue">
-                            Kolokium
-                        </span>
-                    </td>
-                    <td class="action-buttons">
-                        <!-- Lihat -->
-                        <button class="btn-icon btn-view">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="card p-0 overflow-hidden" style="border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+        <div class="table-responsive">
+            <table id="tabelMahasiswa" class="mb-0">
+                <thead style="background: #f8f9fa;">
+                    <tr>
+                        <th style="width: 50px;">No</th>
+                        <th>Tahun Masuk</th>
+                        <th>NIM</th>
+                        <th>Nama</th>
+                        <th>Semester</th>
+                        <th>Milestone Terakhir</th>
+                        <th style="width: 80px;">Detail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($mahasiswas as $index => $mhs)
+                    <tr data-tahun="{{ $mhs->tahun_masuk }}" 
+                        data-semester="{{ $mhs->semester }}" 
+                        data-d1="{{ optional($mhs->pembimbing1)->user->name ?? '' }}" 
+                        data-d2="{{ optional($mhs->pembimbing2)->user->name ?? '' }}">
+                        <td>{{ $index + 1 }}</td>
+                        <td><span class="text-muted">{{ $mhs->angkatan_formatted }}</span></td>
+                        <td><strong>{{ $mhs->nim }}</strong></td>
+                        <td style="text-align:left">{{ $mhs->user->name ?? '-' }}</td>
+                        <td><span class="badge bg-light text-dark border" style="color: #475569 !important;">{{ $mhs->semester ?? '-' }}</span></td>
+                        <td>
+                            @if($mhs->last_milestone ?? null)
+                                <span class="badge badge-blue">{{ $mhs->last_milestone->jenis_milestone }}</span>
+                            @else
+                                <span class="text-muted" style="font-size: 12px;">-</span>
+                            @endif
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ route('admin.detail-mahasiswa', $mhs->id) }}" class="btn-icon btn-view" title="Detail">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" style="text-align:center;color:#aaa;padding:40px">
+                            <i class="fas fa-info-circle mb-2" style="font-size: 24px;"></i><br>
+                            Belum ada data mahasiswa.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="p-3 d-flex justify-content-center">
+            {{ $mahasiswas->links() }}
+        </div>
     </div>
 </div>
 
+@include('admin._table-styles', ['color' => 'blue'])
 <style>
-
-.main {
-    padding: 30px;
-}
-
-.stat-card {
-    color: white;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
-
-.stat-red {
-    background: #e74a3b;
-}
-
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-table th, table td {
-    padding: 14px;
-    text-align: center;
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-table thead {
-    background: #f1f2f6;
-}
-
-table tbody tr {
-    border-bottom: 1px solid #eee;
-}
-
-td:nth-child(4) {
-    max-width: 200px;
-    word-break: break-word;
-}
-
-/* Kolom milestone */
-td:nth-child(6) {
-    max-width: 220px;
-}
-
-table td:nth-child(4)  {
-    text-align: left;
-}
-
-
-td {
-    word-break: break-word;
-}
-
-.badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    display: inline-block;
-    color: white;
-}
-
-.stat-blue {
-    background: #02048d;
-    color: white;
-}
-
-.badge-blue {
-    background: #02048d;
-    color: white;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-icon {
-    border: none;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-/* Warna */
-.btn-view {
-    background: #0dcaf0;
-}
-
-.table-tools {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 15px;
-}
-
-.table-tools input,
-.table-tools select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.role-badge {
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    margin-left: 6px;
-    font-weight: 600;
-}
-
-.role-badge.p1 {
-    background: #e8f0ff;
-    color: #3b4cca;
-}
-
-.role-badge.p2 {
-    background: #e6f4ea;
-    color: #1cc88a;
-}
-
-
+    #tabelMahasiswa td:nth-child(4) { max-width: none; }
 </style>
 
 @endsection
@@ -252,38 +125,23 @@ td {
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    document.getElementById("searchInput").addEventListener("keyup", filterTable);
-    document.getElementById("sortSemester").addEventListener("change", filterTable);
-    document.getElementById("sortTahun").addEventListener("change", filterTable);
-    document.getElementById("sortPeran").addEventListener("change", filterTable);
+    const filterForm = document.getElementById("filterForm");
+    const searchInput = document.getElementById("searchInput");
+    const sortSemester = document.getElementById("sortSemester");
+    const sortTahun = document.getElementById("sortTahun");
+    const sortDosen = document.getElementById("sortDosen");
 
-    function filterTable() {
+    const submitForm = () => filterForm.submit();
 
-        let search = document.getElementById("searchInput").value.toLowerCase();
-        let semester = document.getElementById("sortSemester").value;
-        let tahun = document.getElementById("sortTahun").value;
-        let peran = document.getElementById("sortPeran").value;
+    if (sortSemester) sortSemester.addEventListener("change", submitForm);
+    if (sortTahun) sortTahun.addEventListener("change", submitForm);
+    if (sortDosen) sortDosen.addEventListener("change", submitForm);
 
-        let rows = document.querySelectorAll("#tabelMahasiswa tbody tr");
-
-        rows.forEach(row => {
-
-            let nama = row.cells[3].innerText.toLowerCase();
-            let rowSemester = row.cells[4].innerText.trim();
-            let rowTahun = row.cells[1].innerText.trim();
-
-            // 🔥 ambil dari badge
-            let badge = row.querySelector(".role-badge");
-            let rowPeran = badge ? badge.innerText.trim() : "";
-
-            let show = true;
-
-            if (search && !nama.includes(search)) show = false;
-            if (semester && rowSemester !== semester) show = false;
-            if (tahun && rowTahun !== tahun) show = false;
-            if (peran && rowPeran !== peran) show = false;
-
-            row.style.display = show ? "" : "none";
+    let searchTimeout;
+    if (searchInput) {
+        searchInput.addEventListener("input", () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(submitForm, 1000);
         });
     }
 
