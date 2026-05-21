@@ -89,9 +89,22 @@
         </div>
     @endif
     
-    {{-- Hitung bimbingan selesai di awal --}}
+    {{-- Hitung bimbingan selesai di awal beserta milestone aktif untuk validasi --}}
     @php
         $jumlahBimbinganSelesai = $tugasAkhir ? $tugasAkhir->bimbingans->where('status', 'selesai')->count() : 0;
+
+        $availableIndex = 1;
+        foreach($milestoneMapping as $id => $jenis) {
+            $m = $milestones->get($jenis);
+            if (!$m || $m->status !== 'disetujui') {
+                $availableIndex = $id;
+                break;
+            }
+            if ($id == 11) {
+                $availableIndex = 11;
+            }
+        }
+        $namaMilestoneAktif = $milestoneMapping[$availableIndex] ?? '';
     @endphp
 
     <!-- Status Verifikasi -->
@@ -104,17 +117,41 @@
 
 
                 @if(!$mahasiswa->pembimbing1_id)
-                    <span class="btn-status upload btn-disabled"
-                          title="Pilih dosen pembimbing dulu di halaman Profil"
-                          style="opacity:0.5; cursor:not-allowed; pointer-events:none;">
+                    <button type="button" class="btn-status upload btn-disabled"
+                            onclick="Swal.fire({
+                                icon: 'warning',
+                                title: 'Dosen Pembimbing Belum Dipilih',
+                                text: 'Silakan pilih Dosen Pembimbing terlebih dahulu di halaman Profil Anda sebelum mengupload bukti milestone.',
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Pilih Pembimbing Sekarang',
+                                showCancelButton: true,
+                                cancelButtonText: 'Nanti Saja'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '{{ route('mahasiswa.profile') }}';
+                                }
+                            })"
+                            style="opacity:0.5; cursor:pointer; border:none;">
                         🔒 Upload Verifikasi
-                    </span>
-                @elseif($jumlahBimbinganSelesai < 1)
-                    <span class="btn-status upload btn-disabled"
-                          title="Anda harus melakukan minimal 1 kali bimbingan yang sudah diverifikasi (Selesai) untuk mengupload milestone."
-                          style="opacity:0.5; cursor:not-allowed; pointer-events:none; background: #6c757d;">
+                    </button>
+                @elseif($jumlahBimbinganSelesai < $availableIndex)
+                    <button type="button" class="btn-status upload btn-disabled"
+                            onclick="Swal.fire({
+                                icon: 'warning',
+                                title: 'Bimbingan Belum Cukup',
+                                html: 'Untuk mengupload milestone ke-{{ $availableIndex }} (<strong>{{ $namaMilestoneAktif }}</strong>), Anda harus melakukan minimal <strong>{{ $availableIndex }} kali bimbingan</strong> yang telah diverifikasi (Selesai) oleh Dosen Pembimbing.<br><br>Saat ini Anda baru memiliki <strong>{{ $jumlahBimbinganSelesai }} bimbingan selesai</strong>.',
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ajukan Bimbingan Sekarang',
+                                showCancelButton: true,
+                                cancelButtonText: 'Nanti Saja'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '{{ url('/mahasiswa/tambah-bimbingan') }}';
+                                }
+                            })"
+                            style="opacity:0.8; cursor:pointer; border:none; background: #6c757d;">
                         🔒 Upload Verifikasi
-                    </span>
+                    </button>
                 @else
                     <button type="button" data-bs-toggle="modal" data-bs-target="#uploadModal" class="btn-status upload" style="border:none; cursor:pointer;">
                         Upload Verifikasi
@@ -122,11 +159,23 @@
                 @endif
 
                 @if(!$mahasiswa->pembimbing1_id)
-                    <span class="btn-status timeline btn-disabled"
-                          title="Pilih dosen pembimbing dulu di halaman Profil"
-                          style="opacity:0.5; cursor:not-allowed; pointer-events:none;">
+                    <button type="button" class="btn-status timeline btn-disabled"
+                            onclick="Swal.fire({
+                                icon: 'warning',
+                                title: 'Dosen Pembimbing Belum Dipilih',
+                                text: 'Silakan pilih Dosen Pembimbing terlebih dahulu di halaman Profil Anda sebelum mengubah timeline.',
+                                confirmButtonColor: '#36b9cc',
+                                confirmButtonText: 'Pilih Pembimbing Sekarang',
+                                showCancelButton: true,
+                                cancelButtonText: 'Nanti Saja'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '{{ route('mahasiswa.profile') }}';
+                                }
+                            })"
+                            style="opacity:0.5; cursor:pointer; border:none;">
                         🔒 Ubah Timeline
-                    </span>
+                    </button>
                 @else
                     <button type="button" data-bs-toggle="modal" data-bs-target="#timelineModal" class="btn-status timeline" style="border:none; cursor:pointer;">
                         Ubah Timeline
@@ -150,6 +199,8 @@
             </div>
         </div>
         @endif
+
+
 
         @php
             $ms = function($id) use ($milestones, $milestoneMapping) {
@@ -261,7 +312,6 @@
                 <tr>
                     <th>Jadwal Bimbingan</th>
                     <th>Tempat</th>
-                    <th>Jadwal Terlaksana</th>
                     <th>Catatan Mahasiswa</th>
                     <th>Catatan Dosen</th>
                     <th>Status</th>
@@ -272,11 +322,6 @@
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($bimbingan->tanggal)->format('d M Y') }}{{ $bimbingan->waktu ? ' (' . \Carbon\Carbon::parse($bimbingan->waktu)->format('H:i') . ')' : '' }}</td>
                     <td>{{ $bimbingan->tempat ?? '-' }}</td>
-                    <td>
-                        @if($bimbingan->status === 'selesai' || $bimbingan->status === 'menunggu_verifikasi')
-                           {{ \Carbon\Carbon::parse($bimbingan->updated_at)->format('d M Y') }}
-                        @else - @endif
-                    </td>
                     <td>{{ Str::limit($bimbingan->catatan_mahasiswa ?? $bimbingan->deskripsi, 30) }}</td>
                     <td>{{ Str::limit($bimbingan->catatan, 30) }}</td>
                     <td>

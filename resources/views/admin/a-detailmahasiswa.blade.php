@@ -222,8 +222,22 @@
                         @endif
                     </td>
                     <td>
-                        <button class="btn-icon btn-view" style="background:#0dcaf0; color:white; border:none; border-radius:6px; width:34px; height:34px;"
-                                onclick="openBimbinganDetailModal('{{ $mahasiswa->user->name }}', '{{ \Carbon\Carbon::parse($b->tanggal)->format('d M Y') }}', '{{ $b->waktu }}', '{{ $b->tempat }}', '{{ addslashes($b->deskripsi) }}', '{{ addslashes($b->catatan) }}', '{{ addslashes($b->catatan_mahasiswa) }}', '{{ $b->file_dokumen ? asset('storage/'.$b->file_dokumen) : '' }}')">
+                        <button type="button" class="btn-icon btn-view" style="background:#0dcaf0; color:white; border:none; border-radius:6px; width:34px; height:34px; cursor:pointer;"
+                                onclick="openBimbinganDetailModal(
+                                    this.getAttribute('data-nama'),
+                                    '{{ \Carbon\Carbon::parse($b->tanggal)->format('d M Y') }}',
+                                    '{{ $b->waktu }}',
+                                    this.getAttribute('data-tempat'),
+                                    this.getAttribute('data-deskripsi'),
+                                    this.getAttribute('data-catatan-dosen'),
+                                    this.getAttribute('data-catatan-mhs'),
+                                    '{{ $b->file_dokumen ? asset('storage/'.$b->file_dokumen) : '' }}'
+                                )"
+                                data-nama="{{ $mahasiswa->user->name }}"
+                                data-tempat="{{ $b->tempat ?? '-' }}"
+                                data-deskripsi="{{ $b->deskripsi ?? '' }}"
+                                data-catatan-dosen="{{ $b->catatan ?? '' }}"
+                                data-catatan-mhs="{{ $b->catatan_mahasiswa ?? '' }}">
                             <i class="fas fa-eye"></i>
                         </button>
                     </td>

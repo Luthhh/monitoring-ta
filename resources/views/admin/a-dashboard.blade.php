@@ -131,7 +131,7 @@
 {{-- GRAFIK BIMBINGAN TREND (NEW) --}}
 <div class="box">
     <div class="box-header">
-        <h3>📉 Trend Aktivitas Bimbingan (6 Bulan Terakhir)</h3>
+        <h3>📊 Tren Aktivitas Bimbingan (6 Bulan Terakhir)</h3>
     </div>
     <div class="chart-container-bar" style="height: 300px;">
         <canvas id="bimbinganTrendChart"></canvas>
@@ -846,36 +846,72 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // --- BIMBINGAN TREND CHART ---
+    // --- BIMBINGAN TREND CHART (Grouped Bar Chart) ---
     const ctxTrend = document.getElementById('bimbinganTrendChart');
     new Chart(ctxTrend, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: @json(collect($chartBimbingan)->pluck('month')),
             datasets: [
                 {
                     label: 'Rencana',
                     data: @json(collect($chartBimbingan)->pluck('planned')),
-                    borderColor: '#4e73df',
-                    backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                    fill: true,
-                    tension: 0.3
+                    backgroundColor: '#4e73df',
+                    borderColor: '#2e59d9',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    hoverBackgroundColor: '#2e59d9'
                 },
                 {
                     label: 'Terlaksana',
                     data: @json(collect($chartBimbingan)->pluck('completed')),
-                    borderColor: '#1cc88a',
-                    backgroundColor: 'transparent',
-                    fill: false,
-                    tension: 0.3
+                    backgroundColor: '#1cc88a',
+                    borderColor: '#17a673',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    hoverBackgroundColor: '#17a673'
                 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'top' } },
-            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: { family: "'Inter', sans-serif", size: 12, weight: '500' }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                    padding: 12,
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 13 },
+                    cornerRadius: 8,
+                    displayColors: true
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: "'Inter', sans-serif", weight: '500' } }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f1f5f9' },
+                    ticks: {
+                        stepSize: 1,
+                        font: { family: "'Inter', sans-serif" }
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            }
         }
     });
 

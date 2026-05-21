@@ -24,6 +24,29 @@
     </div>
 </div>
 
+{{-- Modal Kirim Pengingat --}}
+<div id="reminderModal" class="modal-log">
+    <div class="modal-content-log">
+        <div class="modal-header">
+            <h4>📢 Kirim Pengingat</h4>
+            <span class="close-modal" onclick="closeReminderModal()">✖</span>
+        </div>
+        <form id="reminderForm" method="POST">
+            @csrf
+            <div class="modal-body">
+                <p style="font-size:14px; margin-bottom:12px; text-align: left;">Kirim pengingat ke: <strong id="reminderNama"></strong></p>
+                <label style="font-size:13px; font-weight:600; margin-bottom:6px; display:block; text-align: left;">Pesan:</label>
+                <textarea name="pesan" class="form-control" rows="3"
+                    placeholder="Contoh: Mohon segera melakukan bimbingan...">Mohon segera melakukan bimbingan. Harap menghubungi dosen pembimbing Anda secepatnya.</textarea>
+            </div>
+            <div class="modal-footer-log mt-3" style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" class="btn-close-log" onclick="closeReminderModal()" style="background:#858796; color:white; border:none; padding:8px 18px; border-radius:8px; cursor:pointer;">Batal</button>
+                <button type="submit" class="btn-acc" style="background:#1cc88a; color:white; border:none; padding:8px 18px; border-radius:8px; cursor:pointer;">Kirim</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="page-wrapper">
     <h2 class="page-title">Detail Aktivitas Bimbingan</h2>
 
@@ -66,10 +89,9 @@
                     <td>{{ $targetDate }}</td>
                     <td><span class="status-badge pending">Belum</span></td>
                     <td onclick="event.stopPropagation();">
-                        <form action="{{ url('/dosen/kirim-pengingat/' . $mhs->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn-remind" title="Ingatkan Mahasiswa"><i class="fas fa-bell"></i></button>
-                        </form>
+                        <button type="button" class="btn-remind" title="Ingatkan Mahasiswa" onclick="openReminderModal({{ $mhs->id }}, '{{ addslashes($mhs->user->name) }}')">
+                            <i class="fas fa-bell"></i>
+                        </button>
                     </td>
                 </tr>
                 @empty
@@ -115,7 +137,7 @@
                         'name' => $mhs->user->name ?? '-',
                         'role' => $roleLabel,
                         'roleClass' => $roleClass,
-                        'kegiatan' => $bim->nama_kegiatan ?? '-',
+                        'kegiatan' => $bim->nama_dokumen ?? $bim->nama_kegiatan ?? $bim->deskripsi ?? '-',
                         'tgl_bimbingan' => \Carbon\Carbon::parse($bim->tanggal)->format('d M Y'),
                         'tempat' => $bim->tipe_penyelenggaraan ?? '-',
                         'durasi' => ($bim->durasi_jam ?? '-') . ' Jam',
@@ -159,4 +181,23 @@
 
 @push('scripts')
     <script src="{{ asset('js/dosen/d-aktivitasbimbingan.js') }}"></script>
+    <script>
+    function openReminderModal(id, nama) {
+        document.getElementById('reminderNama').textContent = nama;
+        document.getElementById('reminderForm').action = '/dosen/kirim-pengingat/' + id;
+        document.getElementById('reminderModal').style.display = 'flex';
+    }
+    function closeReminderModal() {
+        document.getElementById('reminderModal').style.display = 'none';
+    }
+    window.addEventListener('click', function(e) {
+        const modal = document.getElementById('reminderModal');
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+    </script>
+    <style>
+    .form-control { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; resize: vertical; }
+    </style>
 @endpush

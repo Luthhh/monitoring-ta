@@ -127,6 +127,12 @@ class AdminController extends Controller
     }
 
     // ─── Dashboard ──────────────────────────────────────────────────────────
+    /**
+     * Dashboard Administrator.
+     * 
+     * Menampilkan statistik global mahasiswa (tepat waktu vs tidak tepat waktu), 
+     * milestone yang tertunda, dan ringkasan aktivitas bimbingan bulanan.
+     */
     public function dashboard()
     {
         $allMhs = Mahasiswa::with(['tugasAkhir.milestones', 'tugasAkhir.bimbingans'])->get();
@@ -315,6 +321,11 @@ class AdminController extends Controller
     }
 
     // ─── Laporan Kritis, Batas Studi, Lulus Tepat Waktu ──────────────────────
+    /**
+     * Laporan Mahasiswa Kritis.
+     * 
+     * Menampilkan daftar mahasiswa semester 7 ke atas yang belum melaksanakan Seminar.
+     */
     public function kritisMahasiswa()
     {
         $allMhs = Mahasiswa::with(['tugasAkhir.milestones', 'user'])->get();
@@ -332,6 +343,11 @@ class AdminController extends Controller
         return view('admin.a-kritismahasiswa', compact('mahasiswas'));
     }
 
+    /**
+     * Laporan Mahasiswa Mendekati Batas Studi.
+     * 
+     * Menampilkan mahasiswa semester 8+ yang sudah seminar tapi belum lulus, atau semester 7 yang sudah seminar.
+     */
     public function batasStudiMahasiswa()
     {
         $allMhs = Mahasiswa::with(['tugasAkhir.milestones', 'user'])->get();
@@ -355,6 +371,11 @@ class AdminController extends Controller
         return view('admin.a-batasstudi', compact('mahasiswas'));
     }
 
+    /**
+     * Laporan Mahasiswa Lulus Tepat Waktu.
+     * 
+     * Menampilkan mahasiswa yang berhasil lulus (SKL) di semester 4 atau kurang.
+     */
     public function ontrackMahasiswa()
     {
         $allMhs = Mahasiswa::with(['tugasAkhir.milestones', 'user'])->get();
@@ -409,6 +430,11 @@ class AdminController extends Controller
     }
 
     // ─── Manajemen Dosen ─────────────────────────────────────────────────────
+    /**
+     * Manajemen Data Dosen.
+     * 
+     * Mengelola akun dosen pembimbing (CRUD) dan menampilkan daftar dosen beserta NIP dan Prodi.
+     */
     public function index(Request $request)
     {
         $query = Dosen::with('user');
@@ -482,6 +508,11 @@ class AdminController extends Controller
     }
 
     // ─── Manajemen Mahasiswa ─────────────────────────────────────────────────
+    /**
+     * Manajemen Data Mahasiswa.
+     * 
+     * Mengelola akun mahasiswa (CRUD), termasuk filtering berdasarkan tahun masuk, semester, dan nama pembimbing.
+     */
     public function manajemenMahasiswa(Request $request)
     {
         $query = Mahasiswa::with(['user', 'pembimbing1.user', 'pembimbing2.user', 'tugasAkhir.milestones', 'tugasAkhir.bimbingans']);
@@ -693,6 +724,11 @@ class AdminController extends Controller
     }
 
     // ─── Import / Export ─────────────────────────────────────────────────────
+    /**
+     * Export Data Mahasiswa ke Excel.
+     * 
+     * Mengunduh data mahasiswa berdasarkan kategori tertentu (kritis, ahead, ideal, behind, dll).
+     */
     public function exportMahasiswa(Request $request)
     {
         $kategori = $request->query('kategori');
@@ -762,6 +798,11 @@ class AdminController extends Controller
         return Excel::download(new DosenExport(), 'dosen_' . now()->format('Ymd_His') . '.xlsx');
     }
 
+    /**
+     * Import Data Mahasiswa via Excel/CSV.
+     * 
+     * Menambahkan data mahasiswa secara massal menggunakan file template yang telah disediakan.
+     */
     public function importMahasiswa(Request $request)
     {
         $request->validate([
@@ -854,6 +895,22 @@ class AdminController extends Controller
 
 
     // ─── Profile ─────────────────────────────────────────────────────────────
+    /**
+     * Profil Admin.
+     * 
+     * Menampilkan halaman profil administrator.
+     */
+    public function profile()
+    {
+        $user = auth()->user();
+        return view('admin.a-profile', compact('user'));
+    }
+
+    /**
+     * Update Profil Admin.
+     * 
+     * Mengubah data nama, email, dan password administrator.
+     */
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
@@ -875,6 +932,11 @@ class AdminController extends Controller
         return back()->with('success', 'Profil berhasil diupdate');
     }
 
+    /**
+     * Unggah Berita Acara (BAP).
+     * 
+     * Admin mengunggah file BAP (PDF) untuk milestone yang sudah disetujui oleh dosen pembimbing.
+     */
     public function uploadBap(Request $request, $id)
     {
         $request->validate([

@@ -30,6 +30,11 @@ class MahasiswaController extends Controller
         '11' => 'SKL',
     ];
 
+    /**
+     * Menampilkan Dashboard Mahasiswa.
+     * 
+     * Mengambil data Tugas Akhir, Milestone, dan riwayat Bimbingan mahasiswa yang sedang login.
+     */
     public function dashboard()
     {
         $user = Auth::user();
@@ -49,6 +54,11 @@ class MahasiswaController extends Controller
         return view('mahasiswa.m-dashboard', compact('user', 'mahasiswa', 'tugasAkhir', 'milestones', 'milestoneMapping', 'bimbingans'));
     }
 
+    /**
+     * Menampilkan Profil Mahasiswa.
+     * 
+     * Mengambil data user, detail mahasiswa, dan daftar dosen untuk pilihan pembimbing.
+     */
     public function profile()
     {
         $user = Auth::user();
@@ -59,6 +69,11 @@ class MahasiswaController extends Controller
         return view('mahasiswa.m-profile', compact('user', 'mahasiswa', 'tugasAkhir', 'dosens'));
     }
 
+    /**
+     * Memperbarui Profil Mahasiswa.
+     * 
+     * Mengupdate data dasar user, password (opsional), SK Pembimbing (PDF), dan Foto Profil.
+     */
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
@@ -145,6 +160,11 @@ class MahasiswaController extends Controller
         return view('mahasiswa.tambah-bimbingan', compact('mahasiswa', 'dosens'));
     }
 
+    /**
+     * Menyimpan Pengajuan Bimbingan Baru.
+     * 
+     * Mahasiswa mengajukan jadwal bimbingan ke dosen pembimbing. Otomatis membuat Tugas Akhir jika belum ada.
+     */
     public function storeBimbingan(Request $request)
     {
         $mahasiswa = Auth::user()->mahasiswa;
@@ -183,12 +203,18 @@ class MahasiswaController extends Controller
                 'title' => '📝 Pengajuan Bimbingan Baru',
                 'message' => 'Mahasiswa ' . Auth::user()->name . ' mengajukan jadwal bimbingan pada ' . \Carbon\Carbon::parse($request->tanggal)->format('d M Y') . '.',
                 'is_read' => false,
+                'created_at' => now(),
             ]);
         }
 
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Bimbingan berhasil dicatat/diajukan.');
     }
 
+    /**
+     * Mengunggah Bukti Pelaksanaan Bimbingan.
+     * 
+     * Mengupload file dokumen bukti bimbingan dan mengubah status menjadi 'menunggu_verifikasi'.
+     */
     public function uploadBuktiBimbingan(Request $request, $id)
     {
         $bimbingan = Bimbingan::findOrFail($id);
@@ -218,6 +244,7 @@ class MahasiswaController extends Controller
                     'title' => '📄 Bukti Bimbingan Diunggah',
                     'message' => 'Mahasiswa ' . Auth::user()->name . ' telah mengunggah bukti bimbingan. Menunggu verifikasi Anda.',
                     'is_read' => false,
+                    'created_at' => now(),
                 ]);
             }
 
@@ -279,6 +306,12 @@ class MahasiswaController extends Controller
         return back()->with('success', 'Seluruh timeline berhasil diperbarui.');
     }
 
+    /**
+     * Mengunggah Bukti Capaian Milestone.
+     * 
+     * Mahasiswa mengupload bukti file (PDF/Gambar) untuk milestone tertentu (misal: Kolokium, Proposal).
+     * Membutuhkan minimal 1 bimbingan yang sudah 'selesai'.
+     */
     public function uploadVerifikasi(Request $request)
     {
         $mahasiswa = Auth::user()->mahasiswa;
@@ -291,11 +324,18 @@ class MahasiswaController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        // Cek syarat minimal 1 kali bimbingan selesai
+        // Cek syarat minimal bimbingan selesai (1 bimbingan per milestone)
+        $milestoneName = $request->milestone;
+        $milestoneId = array_search($milestoneName, $this->milestoneMapping);
+
+        if ($milestoneId === false) {
+            return back()->with('error', 'Gagal! Milestone tidak valid.');
+        }
+
         $jumlahBimbinganSelesai = $ta ? $ta->bimbingans()->where('status', 'selesai')->count() : 0;
         
-        if ($jumlahBimbinganSelesai < 1) {
-            return back()->with('error', 'Gagal! Anda harus melakukan minimal 1 kali bimbingan yang sudah diverifikasi (Selesai) sebelum dapat mengupload bukti milestone.');
+        if ($jumlahBimbinganSelesai < $milestoneId) {
+            return back()->with('error', 'Gagal! Anda harus melakukan minimal ' . $milestoneId . ' kali bimbingan yang sudah diverifikasi (Selesai) sebelum dapat mengupload bukti milestone "' . $milestoneName . '". Saat ini Anda baru memiliki ' . $jumlahBimbinganSelesai . ' bimbingan selesai.');
         }
 
         if ($request->hasFile('bukti_file')) {
@@ -337,6 +377,7 @@ class MahasiswaController extends Controller
                     'title' => '🏆 Bukti Milestone Baru',
                     'message' => $msg,
                     'is_read' => false,
+                    'created_at' => now(),
                 ]);
             }
             if ($dosen2) {
@@ -345,6 +386,7 @@ class MahasiswaController extends Controller
                     'title' => '🏆 Bukti Milestone Baru',
                     'message' => $msg,
                     'is_read' => false,
+                    'created_at' => now(),
                 ]);
             }
 

@@ -17,10 +17,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
 
-    Route::prefix('admin')->group(function () {
+    Route::prefix('admin')->middleware('role:admin')->group(function () {
 
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-        Route::get('/profile', function() { return view('admin.a-profile'); })->name('admin.profile');
+        Route::get('/profile', [AdminController::class, 'profile'])->name('admin.profile');
         Route::put('/profile/update', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
 
         // Mahasiswa
@@ -71,7 +71,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/verifikasi/bap', [AdminController::class, 'verifikasiBap'])->name('admin.verifikasi.bap');
     });
 
-    Route::prefix('dosen')->group(function () {
+    Route::prefix('dosen')->middleware('role:dosen')->group(function () {
 
         Route::get('/dashboard', [DosenController::class, 'dashboard'])->name('dosen.dashboard');
         Route::get('/total-mahasiswa', [DosenController::class, 'totalMahasiswa'])->name('dosen.total_mahasiswa');
@@ -91,7 +91,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/notifikasi/unread', [DosenController::class, 'getUnreadNotifs'])->name('dosen.notif.unread');
     });
 
-    Route::prefix('mahasiswa')->group(function () {
+    Route::prefix('mahasiswa')->middleware('role:mahasiswa')->group(function () {
 
         Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
         Route::post('/upload-verifikasi', [MahasiswaController::class, 'uploadVerifikasi']);

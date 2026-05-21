@@ -77,6 +77,277 @@
             background-color: #f8f9fa;
         }
 
+        /* ==========================================================================
+           RESPONSIVE RULES (MOBILE & TABLET <= 768px)
+           ========================================================================== */
+        @media (max-width: 768px) {
+            body, html {
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            /* Make layout container stack vertically */
+            body > div.d-flex, .d-flex[style*="height: 100vh;"] {
+                flex-direction: column !important;
+                height: 100vh !important;
+            }
+
+            /* Mobile Sidebar Drawer Styling */
+            .sidebar {
+                position: fixed !important;
+                left: 0 !important;
+                top: 0 !important;
+                bottom: 0 !important;
+                width: 260px !important;
+                height: 100vh !important;
+                z-index: 1050 !important;
+                transform: translateX(-100%) !important;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                box-shadow: 5px 0 25px rgba(0, 0, 0, 0.15) !important;
+            }
+
+            /* Keep text & title visible on mobile sidebars since hover does not apply */
+            .sidebar .sidebar-title,
+            .sidebar .sidebar-text {
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+
+            /* Disable hover expansion layout changes */
+            .sidebar:hover {
+                width: 260px !important;
+            }
+
+            /* Sidebar toggle class */
+            .sidebar.show-sidebar {
+                transform: translateX(0) !important;
+            }
+
+            /* Content Panel Adjustments for mobile top navbar */
+            .main {
+                padding-top: 85px !important;
+                padding-left: 15px !important;
+                padding-right: 15px !important;
+                height: calc(100vh - 60px) !important;
+                overflow-y: auto !important;
+                flex: 1 !important;
+                width: 100% !important;
+            }
+
+            /* Premium Glassmorphism Mobile Header */
+            .mobile-header {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 60px;
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border-bottom: 1px solid rgba(78, 115, 223, 0.08);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+                padding: 0 16px;
+                z-index: 1000;
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+            }
+            .mobile-brand img {
+                height: 30px;
+                width: auto;
+            }
+            .mobile-brand span {
+                font-weight: 700;
+                font-size: 15px;
+                color: #4e73df;
+                letter-spacing: -0.3px;
+            }
+
+            .mobile-menu-btn {
+                background: none;
+                border: none;
+                color: #4e73df;
+                font-size: 22px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                transition: background 0.2s;
+                padding: 0;
+            }
+            .mobile-menu-btn:active {
+                background: rgba(78, 115, 223, 0.08);
+            }
+
+            .mobile-right {
+                display: flex;
+                align-items: center;
+            }
+            
+            .mobile-badge {
+                font-size: 10px;
+                font-weight: 600;
+                padding: 3px 8px;
+                border-radius: 20px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .mobile-badge.admin { background: #eef2ff; color: #4e73df; }
+            .mobile-badge.dosen { background: #e0f7f6; color: #0e7c7b; }
+            .mobile-badge.mahasiswa { background: #fff3e0; color: #d62828; }
+
+            /* Backdrop Overlay */
+            .sidebar-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 60, 0.4);
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+                z-index: 1040;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s, visibility 0.3s;
+            }
+            .sidebar-backdrop.show {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            /* Dynamic Sidebar Close Button */
+            .sidebar-close-btn {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: #f1f2f6;
+                color: #6c757d;
+                border: none;
+                cursor: pointer;
+                font-size: 15px;
+                transition: 0.2s;
+                z-index: 1060;
+            }
+            .sidebar-close-btn:active {
+                background: #e4e6eb;
+                color: #212529;
+            }
+
+            /* Make milestone progress bar beautifully swipable horizontally */
+            .milestone-wrapper {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                padding-bottom: 12px;
+                margin-bottom: 10px;
+                -webkit-overflow-scrolling: touch;
+                justify-content: flex-start !important;
+                scrollbar-width: thin;
+                gap: 12px;
+            }
+            .milestone-wrapper::-webkit-scrollbar {
+                height: 4px;
+            }
+            .milestone-wrapper::-webkit-scrollbar-thumb {
+                background-color: #cbd5e1;
+                border-radius: 2px;
+            }
+            .milestone-wrapper .col {
+                flex: 0 0 85px !important;
+                min-width: 85px !important;
+                max-width: 85px !important;
+                padding: 0 !important;
+            }
+            .milestone-wrapper .step-circle {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 12px !important;
+            }
+            .milestone-wrapper .step-label {
+                font-size: 10px !important;
+                margin-top: 4px !important;
+            }
+
+            /* Tables & lists horizontal scroll */
+            .card-box, .table-mahasiswa {
+                overflow-x: auto !important;
+                padding: 15px !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            .table-custom, .table-mahasiswa table {
+                min-width: 750px !important;
+            }
+
+            /* Dashboard Cards 1 Column layout */
+            .cards {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+            
+            .topbar {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+                margin-bottom: 15px !important;
+            }
+            .topbar h2 {
+                font-size: 18px !important;
+            }
+
+            /* Stack highlight bars & summaries */
+            .highlight-bar, .summary-wrapper {
+                flex-direction: column !important;
+                gap: 12px !important;
+            }
+            .highlight-item, .summary-card {
+                width: 100% !important;
+            }
+
+            /* Filter tools responsiveness */
+            .table-tools {
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            .table-tools input,
+            .table-tools select {
+                flex: 1 1 calc(50% - 8px) !important;
+                min-width: 120px !important;
+            }
+            .table-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 10px !important;
+            }
+            
+            /* Responsive Grid system stack */
+            .row {
+                --bs-gutter-x: 1rem;
+            }
+        }
+
+        /* Desktop specific styles for close button (hidden) */
+        @media (min-width: 769px) {
+            .mobile-header {
+                display: none !important;
+            }
+            .sidebar-close-btn {
+                display: none !important;
+            }
+        }
     </style>
 
     @stack('styles')
@@ -290,6 +561,35 @@
         if (elTanggal)  elTanggal.textContent  = tanggal;
     })();
     </script>
+    @endauth
+
+    @auth
+    @php
+        $mUser = auth()->user();
+        $mRole = $mUser->role->name ?? 'mahasiswa';
+        $mRoleBadges = [
+            'admin'     => 'Admin',
+            'dosen'     => 'Dosen',
+            'mahasiswa' => 'Mahasiswa',
+        ];
+        $mRoleBadge = $mRoleBadges[$mRole] ?? ucfirst($mRole);
+    @endphp
+    <!-- Mobile Top Navbar -->
+    <header class="mobile-header">
+        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Toggle Menu">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="mobile-brand" onclick="window.location.reload();">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo">
+            <span>Monitoring TA</span>
+        </div>
+        <div class="mobile-right">
+            <span class="mobile-badge {{ $mRole }}">{{ $mRoleBadge }}</span>
+        </div>
+    </header>
+
+    <!-- Sidebar Mobile Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleMobileSidebar()"></div>
     @endauth
 
     @yield('content')
@@ -592,7 +892,46 @@
     @stack('scripts')
     
     <script>
+    // Global Mobile Sidebar Toggle
+    function toggleMobileSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        if (sidebar && backdrop) {
+            sidebar.classList.toggle('show-sidebar');
+            backdrop.classList.toggle('show');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+        // Dynamic Mobile Sidebar Close Button Injection
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'sidebar-close-btn';
+            closeBtn.innerHTML = '✖';
+            closeBtn.setAttribute('aria-label', 'Close Menu');
+            closeBtn.onclick = toggleMobileSidebar;
+            
+            const header = sidebar.querySelector('.sidebar-header');
+            if (header) {
+                header.style.position = 'relative';
+                header.appendChild(closeBtn);
+            } else {
+                sidebar.prepend(closeBtn);
+            }
+        }
+
+        @if(session('error_unauthorized'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Akses Ditolak!',
+            text: "{{ session('error_unauthorized') }}",
+            confirmButtonColor: '#4361ee',
+            timer: 4000,
+            timerProgressBar: true
+        });
+        @endif
+
         const confirmForms = document.querySelectorAll('.form-confirm');
         confirmForms.forEach(form => {
             form.addEventListener('submit', function (e) {

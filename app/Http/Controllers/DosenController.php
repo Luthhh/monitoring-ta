@@ -130,6 +130,12 @@ class DosenController extends Controller
     }
 
     // ─── Dashboard ───────────────────────────────────────────────────────────
+    /**
+     * Dashboard Dosen Pembimbing.
+     * 
+     * Menampilkan statistik bimbingan, daftar pengajuan mahasiswa (ahead/ideal/behind), 
+     * dan notifikasi verifikasi yang tertunda.
+     */
     public function dashboard()
     {
         $user   = Auth::user();
@@ -275,6 +281,11 @@ class DosenController extends Controller
     }
 
     // ─── Profile ─────────────────────────────────────────────────────────────
+    /**
+     * Profil Dosen.
+     * 
+     * Menampilkan biodata dosen dan statistik jumlah mahasiswa bimbingan (sebagai Pembimbing 1 & 2).
+     */
     public function profile()
     {
         $user  = Auth::user();
@@ -286,6 +297,11 @@ class DosenController extends Controller
         return view('dosen.d-profile', compact('user', 'dosen', 'jmlPembimbing1', 'jmlPembimbing2'));
     }
 
+    /**
+     * Perbarui Profil Dosen.
+     * 
+     * Mengubah data NIP, Nama, Prodi, Email, dan Password dosen pembimbing.
+     */
     public function update(Request $request)
     {
         $user  = Auth::user();
@@ -353,6 +369,11 @@ class DosenController extends Controller
         return view('dosen.d-datamahasiswa', compact('mahasiswas', 'dosen'));
     }
 
+    /**
+     * Detail Log Bimbingan Mahasiswa.
+     * 
+     * Melihat riwayat lengkap bimbingan dan capaian milestone dari satu mahasiswa tertentu.
+     */
     public function detailMahasiswa($id)
     {
         $dosen     = Auth::user()->dosen;
@@ -395,6 +416,11 @@ class DosenController extends Controller
     }
 
     // ─── Update Status Bimbingan ─────────────────────────────────────────────
+    /**
+     * Verifikasi Status Bimbingan.
+     * 
+     * Menyetujui, menolak, atau menandai selesai pengajuan bimbingan/bukti bimbingan mahasiswa.
+     */
     public function updateBimbinganStatus(Request $request, $id)
     {
         $request->validate(['status' => 'required|in:disetujui,ditolak,selesai']);
@@ -454,6 +480,11 @@ class DosenController extends Controller
     }
 
     // ─── Update Status Milestone ─────────────────────────────────────────────
+    /**
+     * Verifikasi Bukti Milestone Mahasiswa.
+     * 
+     * Menyetujui atau menolak bukti dokumen milestone yang diunggah mahasiswa.
+     */
     public function updateMilestoneStatus(Request $request, $id)
     {
         $request->validate(['status' => 'required|in:disetujui,ditolak']);
@@ -510,6 +541,11 @@ class DosenController extends Controller
     }
 
     // ─── Kirim Pengingat ke Mahasiswa ────────────────────────────────────────
+    /**
+     * Kirim Notifikasi Pengingat ke Mahasiswa.
+     * 
+     * Mengirim pesan pengingat khusus ke mahasiswa tertentu (misal: pengingat untuk segera bimbingan).
+     */
     public function kirimPengingat(Request $request, $id)
     {
         $dosen     = Auth::user()->dosen;

@@ -131,7 +131,6 @@
                     <th>Tgl Upload</th>
                     <th>Dokumen</th>
                     <th>Status</th>
-                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -166,39 +165,6 @@
                             <span class="status-badge menunggu">Menunggu Verifikasi</span>
                         @elseif($m->status == 'ditolak')
                             <span class="status-badge ditolak">Ditolak</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if($m->status == 'menunggu_verifikasi')
-                            <form action="{{ route('dosen.update_milestone_status', $m->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                <input type="hidden" name="status" value="disetujui">
-                                <button type="submit" class="btn btn-success btn-sm">Setujui</button>
-                            </form>
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#tolakMilestoneModal-{{ $m->id }}">Tolak</button>
-
-                            {{-- Modal Tolak --}}
-                            <div class="modal fade" id="tolakMilestoneModal-{{ $m->id }}" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <form action="{{ route('dosen.update_milestone_status', $m->id) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="status" value="ditolak">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Tolak Milestone</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <textarea name="catatan" class="form-control" placeholder="Berikan alasan penolakan atau revisi..." required></textarea>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-danger">Kirim Penolakan</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
                         @endif
                     </td>
                 </tr>
@@ -239,8 +205,22 @@
                         @endif
                     </td>
                     <td>
-                        <button class="btn-icon btn-view" style="background:#0dcaf0; color:white; border:none; border-radius:6px; width:34px; height:34px;"
-                                onclick="openBimbinganDetailModal('{{ $mahasiswa->user->name }}', '{{ \Carbon\Carbon::parse($b->tanggal)->format('d M Y') }}', '{{ $b->waktu }}', '{{ $b->tempat }}', '{{ addslashes($b->deskripsi) }}', '{{ addslashes($b->catatan) }}', '{{ addslashes($b->catatan_mahasiswa) }}', '{{ $b->file_dokumen ? asset('storage/'.$b->file_dokumen) : '' }}')">
+                        <button type="button" class="btn-icon btn-view" style="background:#0dcaf0; color:white; border:none; border-radius:6px; width:34px; height:34px; cursor:pointer;"
+                                onclick="openBimbinganDetailModal(
+                                    this.getAttribute('data-nama'),
+                                    '{{ \Carbon\Carbon::parse($b->tanggal)->format('d M Y') }}',
+                                    '{{ $b->waktu }}',
+                                    this.getAttribute('data-tempat'),
+                                    this.getAttribute('data-deskripsi'),
+                                    this.getAttribute('data-catatan-dosen'),
+                                    this.getAttribute('data-catatan-mhs'),
+                                    '{{ $b->file_dokumen ? asset('storage/'.$b->file_dokumen) : '' }}'
+                                )"
+                                data-nama="{{ $mahasiswa->user->name }}"
+                                data-tempat="{{ $b->tempat ?? '-' }}"
+                                data-deskripsi="{{ $b->deskripsi ?? '' }}"
+                                data-catatan-dosen="{{ $b->catatan ?? '' }}"
+                                data-catatan-mhs="{{ $b->catatan_mahasiswa ?? '' }}">
                             <i class="fas fa-eye"></i>
                         </button>
                     </td>

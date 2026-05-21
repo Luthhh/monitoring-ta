@@ -125,7 +125,7 @@
 
     <div class="box" style="margin-top: 30px;">
         <div class="box-header">
-            <h3>📉 Grafik Ringkasan Bimbingan (6 Bulan Terakhir)</h3>
+            <h3>📊 Grafik Ringkasan Bimbingan (6 Bulan Terakhir)</h3>
         </div>
         <div class="chart-container">
             <canvas id="bimbinganChart"></canvas>
@@ -295,7 +295,7 @@
                                 '{{ optional($mahasiswa_vb)->nim ?? '-' }}',
                                 '{{ addslashes(optional($user_mhs_vb)->name ?? '-') }}',
                                 '{{ \Carbon\Carbon::parse($vb->tanggal)->format('d M Y') }}',
-                                '{{ addslashes($vb->nama_kegiatan ?? '-') }}',
+                                '{{ addslashes($vb->nama_dokumen ?? $vb->nama_kegiatan ?? '-') }}',
                                 '{{ addslashes($vb->catatan_mahasiswa ?? $vb->deskripsi ?? '-') }}',
                                 '{{ $vb->file_dokumen ? asset('storage/'.$vb->file_dokumen) : '' }}',
                                 '{{ $vb->link_kegiatan ?? '' }}'
@@ -455,7 +455,7 @@
 <div id="approveModal" class="modal-log">
     <div class="modal-content-log">
         <div class="modal-header">
-            <h4>Setujui Milestone</h4>
+            <h4>Setujui</h4>
             <span class="close-modal" onclick="closeModal('approveModal')">✖</span>
         </div>
         <div class="modal-body">

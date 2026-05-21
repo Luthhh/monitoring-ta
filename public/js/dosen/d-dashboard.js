@@ -103,29 +103,31 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Chart Ringkasan Bimbingan
+    // Chart Ringkasan Bimbingan (Grouped Bar Chart)
     const bimbinganCtx = document.getElementById('bimbinganChart');
     if (bimbinganCtx && chartBimbingan) {
         new Chart(bimbinganCtx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: chartBimbingan.labels,
                 datasets: [
                     {
                         label: 'Rencana Bimbingan',
                         data: chartBimbingan.rencana,
-                        borderColor: '#4e73df',
-                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                        fill: true,
-                        tension: 0.3
+                        backgroundColor: '#4e73df',
+                        borderColor: '#2e59d9',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        hoverBackgroundColor: '#2e59d9'
                     },
                     {
                         label: 'Terlaksana',
                         data: chartBimbingan.terlaksana,
-                        borderColor: '#1cc88a',
-                        backgroundColor: 'rgba(28, 200, 138, 0.05)',
-                        fill: true,
-                        tension: 0.3
+                        backgroundColor: '#1cc88a',
+                        borderColor: '#17a673',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        hoverBackgroundColor: '#17a673'
                     }
                 ]
             },
@@ -144,21 +146,26 @@ document.addEventListener("DOMContentLoaded", function() {
                     tooltip: {
                         backgroundColor: 'rgba(17, 24, 39, 0.9)',
                         padding: 12,
-                        cornerRadius: 8,
                         titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 13 }
+                        bodyFont: { size: 13 },
+                        cornerRadius: 8,
+                        displayColors: true
                     }
                 },
                 scales: {
                     x: { 
                         grid: { display: false },
-                        ticks: { font: { family: "'Inter', sans-serif" } }
+                        ticks: { font: { family: "'Inter', sans-serif", weight: '500' } }
                     },
                     y: { 
                         beginAtZero: true, 
                         grid: { color: '#f1f5f9' },
                         ticks: { stepSize: 1, font: { family: "'Inter', sans-serif" } } 
                     }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
                 }
             }
         });
