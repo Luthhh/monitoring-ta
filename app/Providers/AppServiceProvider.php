@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         \Dedoc\Scramble\Scramble::routes(function (\Illuminate\Routing\Route $route) {
             // Sembunyikan rute statis (Route::view) agar tidak mengotori dokumentasi API
             if (is_string($route->getActionName()) && str_contains($route->getActionName(), 'ViewController')) {
