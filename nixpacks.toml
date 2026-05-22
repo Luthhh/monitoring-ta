@@ -1,12 +1,14 @@
-# Configuration for Railway Nixpacks
-# Ref: https://nixpacks.com/docs/providers/php
+# Nixpacks configuration for Laravel with PHP and Node
+providers = ["php", "node"]
 
 [phases.install]
-cmds = ["composer install --optimize-autoloader --no-scripts --no-interaction --ignore-platform-req=ext-gd"]
+cmds = [
+    "composer install --optimize-autoloader --no-scripts --no-interaction --ignore-platform-req=ext-gd",
+    "npm install"
+]
 
 [phases.build]
 cmds = [
-    "npm install",
     "npm run build"
 ]
 
