@@ -29,6 +29,15 @@
                 {{ session('success') }}
             </div>
         @endif
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <table id="tabelDosen">
             <thead>
                 <tr>
@@ -182,14 +191,28 @@
 
                     <div class="modal-body">
 
-                        <input type="text" name="nip" value="{{ $dosen->nip }}" class="form-control mb-2" required>
+                        <div class="mb-3 text-start">
+                            <label class="form-label fw-bold">NIP</label>
+                            <input type="text" name="nip" value="{{ $dosen->nip }}" class="form-control" required>
+                        </div>
 
-                        <input type="text" name="name" value="{{ $dosen->user->name }}" class="form-control mb-2" required>
+                        <div class="mb-3 text-start">
+                            <label class="form-label fw-bold">Nama</label>
+                            <input type="text" name="name" value="{{ $dosen->user->name }}" class="form-control" required>
+                        </div>
 
-                        <input type="text" name="prodi" value="{{ $dosen->prodi }}" class="form-control mb-3" required>
+                        <div class="mb-3 text-start">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" name="email" value="{{ $dosen->user->email }}" class="form-control" required>
+                        </div>
 
-                        <div class="mb-3">
-                            <label>Password Baru (Kosongkan Jika Tidak Diubah)</label>
+                        <div class="mb-3 text-start">
+                            <label class="form-label fw-bold">Program Studi</label>
+                            <input type="text" name="prodi" value="{{ $dosen->prodi }}" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3 text-start">
+                            <label class="form-label fw-bold">Password Baru (Kosongkan Jika Tidak Diubah)</label>
                             <div class="input-group" style="display: flex;">
                                 <input type="password" name="password" class="form-control password-input" style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
                                 <button class="btn btn-outline-secondary toggle-password" type="button" style="border: 1px solid #ced4da; border-left: none; border-radius: 0 10px 10px 0;">
@@ -201,6 +224,7 @@
                     </div>
 
                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-success">Update</button>
                     </div>
 
