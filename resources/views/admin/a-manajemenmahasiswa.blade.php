@@ -25,7 +25,7 @@
 <!-- Statistik -->
 <div class="cards mt-3">
     <a href="{{ url('/admin/total-mahasiswa') }}" class="card blue text-decoration-none">
-        <h2>{{ $mahasiswas->count() }}</h2>
+        <h2>{{ $mahasiswas->total() }}</h2>
         <p>Mahasiswa Aktif</p>
     </a>
     <a href="{{ url('/admin/ahead-mahasiswa') }}" class="card green text-decoration-none">

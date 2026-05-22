@@ -15,7 +15,7 @@
     <div class="stat-card stat-blue mb-4 d-flex align-items-center justify-content-between">
         <div>
             <p class="mb-1 opacity-75">Total Mahasiswa Terdaftar</p>
-            <h2 class="mb-0" style="font-size: 38px;">{{ $mahasiswas->count() }}</h2>
+            <h2 class="mb-0" style="font-size: 38px;">{{ $mahasiswas->total() }}</h2>
         </div>
         <i class="fas fa-user-graduate" style="font-size: 40px; opacity: 0.3;"></i>
     </div>
