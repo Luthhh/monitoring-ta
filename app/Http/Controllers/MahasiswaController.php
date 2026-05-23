@@ -46,7 +46,7 @@ class MahasiswaController extends Controller
         
         if ($tugasAkhir) {
             $milestones = $tugasAkhir->milestones->keyBy('jenis_milestone');
-            $bimbingans = $tugasAkhir->bimbingans()->latest()->get();
+            $bimbingans = $tugasAkhir->bimbingans()->with('dosen.user')->latest()->get();
         }
 
         $milestoneMapping = $this->milestoneMapping;

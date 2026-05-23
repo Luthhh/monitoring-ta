@@ -460,6 +460,17 @@
                 <div class="colon">:</div>
                 <div class="value">{{ $mahasiswa->user->name }}</div>
 
+                <div class="label">Dosen Pembimbing</div>
+                <div class="colon">:</div>
+                <div class="value">
+                    {{ $bimbingan->dosen->user->name ?? '-' }}
+                    @if($bimbingan->dosen_id == $mahasiswa->pembimbing1_id)
+                        <span class="role-badge p1">Pembimbing 1</span>
+                    @elseif($bimbingan->dosen_id == $mahasiswa->pembimbing2_id)
+                        <span class="role-badge p2">Pembimbing 2</span>
+                    @endif
+                </div>
+
                 <div class="label">Tanggal</div>
                 <div class="colon">:</div>
                 <div class="value">{{ \Carbon\Carbon::parse($bimbingan->tanggal)->format('d M Y') }}</div>
@@ -959,6 +970,25 @@ td {
 .status-badge.pending {
     background: #fde8e8;
     color: #e74a3b;
+}
+
+.role-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    margin-left: 6px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.role-badge.p1 {
+    background: #e8f0ff;
+    color: #3b4cca;
+}
+
+.role-badge.p2 {
+    background: #e6f4ea;
+    color: #1cc88a;
 }
 
 .btn-view-log {

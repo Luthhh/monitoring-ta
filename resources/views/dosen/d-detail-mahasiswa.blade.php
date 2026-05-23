@@ -214,9 +214,11 @@
                                     this.getAttribute('data-deskripsi'),
                                     this.getAttribute('data-catatan-dosen'),
                                     this.getAttribute('data-catatan-mhs'),
-                                    '{{ $b->file_dokumen ? asset('storage/'.$b->file_dokumen) : '' }}'
+                                    '{{ $b->file_dokumen ? asset('storage/'.$b->file_dokumen) : '' }}',
+                                    this.getAttribute('data-dosen')
                                 )"
                                 data-nama="{{ $mahasiswa->user->name }}"
+                                data-dosen="{{ $b->dosen->user->name ?? '-' }}"
                                 data-tempat="{{ $b->tempat ?? '-' }}"
                                 data-deskripsi="{{ $b->deskripsi ?? '' }}"
                                 data-catatan-dosen="{{ $b->catatan ?? '' }}"
@@ -381,8 +383,9 @@ window.addEventListener('click', function(e) {
     });
 });
 
-function openBimbinganDetailModal(mhsNama, tgl, waktu, tempat, deskripsi, hasil, catatanMhs, filePath) {
+function openBimbinganDetailModal(mhsNama, tgl, waktu, tempat, deskripsi, hasil, catatanMhs, filePath, dosenNama) {
     document.getElementById('bd-nama').textContent = mhsNama || '-';
+    document.getElementById('bd-dosen').textContent = dosenNama || '-';
     document.getElementById('bd-tgl').textContent = tgl || '-';
     document.getElementById('bd-waktu').textContent = waktu ? waktu : '-';
     document.getElementById('bd-tempat').textContent = tempat || '-';
@@ -436,6 +439,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="label">Nama</div>
                 <div class="colon">:</div>
                 <div class="value" id="bd-nama"></div>
+
+                <div class="label">Dosen Pembimbing</div>
+                <div class="colon">:</div>
+                <div class="value" id="bd-dosen"></div>
 
                 <div class="label">Jadwal Bimbingan</div>
                 <div class="colon">:</div>
