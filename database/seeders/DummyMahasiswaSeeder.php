@@ -161,5 +161,73 @@ class DummyMahasiswaSeeder extends Seeder
             }
         }
 
+        // 3. Create 5 Special "Lulus Tepat Waktu" Students (Semester <= 4 with SKL milestone approved)
+        $namaTepatWaktu = [
+            'Ahmad Fauzi',
+            'Siti Aminah',
+            'Rizky Pratama',
+            'Putri Lestari',
+            'Budi Setiawan'
+        ];
+        
+        foreach ($namaTepatWaktu as $idx => $name) {
+            $nim = 'J0403222' . str_pad(100 + $idx, 3, '0', STR_PAD_LEFT);
+            $user = User::create([
+                'name' => $name,
+                'email' => strtolower(str_replace(' ', '', $name)) . '@apps.ipb.ac.id',
+                'password' => Hash::make('password'),
+                'role_id' => $mahasiswaRole->id,
+            ]);
+
+            $p1 = $dosens->random();
+            $p2 = $dosens->where('id', '!=', $p1->id)->random();
+
+            $mahasiswa = Mahasiswa::create([
+                'user_id' => $user->id,
+                'nim' => $nim,
+                'prodi' => $prodis[array_rand($prodis)],
+                'tahun_masuk' => 2022,
+                'semester' => 4,
+                'pembimbing1_id' => $p1->id,
+                'pembimbing2_id' => $p2->id,
+            ]);
+
+            $ta = TugasAkhir::create([
+                'mahasiswa_id' => $mahasiswa->id,
+                'judul' => 'Sistem Informasi ' . ($idx + 1) . ' Terintegrasi Berbasis Web',
+                'status' => 'Selesai',
+                'tanggal_mulai' => Carbon::now()->subMonths(10),
+            ]);
+
+            // All milestones are approved
+            foreach ($milestoneTypes as $index => $type) {
+                Milestone::create([
+                    'tugas_akhir_id' => $ta->id,
+                    'jenis_milestone' => $type,
+                    'status' => 'disetujui',
+                    'deadline' => Carbon::now()->subMonths(10 - $index),
+                    'tanggal_upload' => Carbon::now()->subMonths(10 - $index)->subDays(7),
+                    'tanggal_disetujui' => Carbon::now()->subMonths(10 - $index),
+                    'file_path' => 'dummy_file.pdf',
+                    'file_bap' => $type !== 'SKL' ? 'bap_milestone.pdf' : null,
+                ]);
+            }
+
+            // Create some bimbingans
+            for ($k = 1; $k <= 12; $k++) {
+                Bimbingan::create([
+                    'tugas_akhir_id' => $ta->id,
+                    'dosen_id' => ($k % 2 == 0) ? $p1->id : $p2->id,
+                    'tanggal' => Carbon::now()->subMonths(11)->addDays($k * 15),
+                    'waktu' => '09:00',
+                    'tempat' => 'Ruang Dosen',
+                    'deskripsi' => 'Bimbingan milestone progres ke-' . $k,
+                    'hasil_bimbingan' => 'Disetujui untuk lanjut.',
+                    'status' => 'selesai',
+                    'tahun_semester' => '2023/2024-Genap',
+                ]);
+            }
+        }
+
     }
 }
