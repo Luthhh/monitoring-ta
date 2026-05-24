@@ -73,7 +73,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center" style="font-weight: 500; padding:20px; text-align:center;">
+                    <td colspan="7" class="text-center" style="font-weight: 500; padding:20px; text-align:center;">
                         🎉 Semua mahasiswa aktif melakukan bimbingan dalam 30 hari terakhir.
                     </td>
                 </tr>
