@@ -7,11 +7,23 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    // ─── Tampilkan Form Login ────────────────────────────────────────────────
+    /**
+     * Tampilkan Halaman Login.
+     * 
+     * Merender halaman login aplikasi.
+     */
     public function showLogin()
     {
         return view('auth.login');
     }
 
+    // ─── Proses Login Pengguna ───────────────────────────────────────────────
+    /**
+     * Proses Login Pengguna.
+     * 
+     * Melakukan autentikasi email & password pengguna dan melakukan pengalihan berdasarkan role (admin/dosen/mahasiswa).
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -40,6 +52,12 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
+    // ─── Proses Logout Pengguna ──────────────────────────────────────────────
+    /**
+     * Proses Logout Pengguna.
+     * 
+     * Mengeluarkan sesi login pengguna, menghapus data session, dan dialihkan ke halaman login.
+     */
     public function logout(Request $request)
     {
         Auth::logout();

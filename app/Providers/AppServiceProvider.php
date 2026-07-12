@@ -29,7 +29,11 @@ class AppServiceProvider extends ServiceProvider
                 return false;
             }
 
-            return str_starts_with($route->uri, 'admin/') || 
+            $isPostLogin = $route->uri === 'login' && in_array('POST', $route->methods());
+
+            return $isPostLogin || 
+                   $route->uri === 'logout' ||
+                   str_starts_with($route->uri, 'admin/') || 
                    str_starts_with($route->uri, 'dosen/') || 
                    str_starts_with($route->uri, 'mahasiswa/');
         });

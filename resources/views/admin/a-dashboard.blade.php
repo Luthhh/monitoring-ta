@@ -93,7 +93,7 @@
     <!-- 🟢 Tepat waktu -->
     <a href="{{ url('/admin/ontrack-mahasiswa') }}" class="kritis-card success bottom-row text-decoration-none">
         <div class="kritis-header">
-            <span class="kritis-title">Lulus Tepat Waktu</span>
+            <span class="kritis-title">Tepat Waktu (On-Track)</span>
             <i class="fas fa-user-check" style="color: #10b981; font-size: 18px;"></i>
         </div>
         <div class="kritis-value" style="color: #10b981;">{{ $mhsTepatWaktu }}</div>
@@ -650,7 +650,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 { 
                     label: 'Sudah', 
                     data: Object.values(globalMilestoneStats).map(s => s.sudah), 
-                    backgroundColor: '#10b981', // Emerald
+                    backgroundColor: '#2610b9ff', // Emerald
                     borderColor: '#059669',
                     borderWidth: 1,
                     borderRadius: 6,

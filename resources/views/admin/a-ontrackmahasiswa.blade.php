@@ -6,12 +6,12 @@
 <div class="main">
     <div class="d-flex align-items-center gap-3 mb-4">
         <a href="{{ route('admin.dashboard') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
-        <h2 class="mb-0">Lulus Tepat Waktu 🟢</h2>
+        <h2 class="mb-0">Tepat Waktu (On-Track) 🟢</h2>
     </div>
 
     <div class="stat-card stat-green mb-4 d-flex align-items-center justify-content-between">
         <div>
-            <p class="mb-1 opacity-75">Mahasiswa Semester 1-4 yang Lulus Milestone</p>
+            <p class="mb-1 opacity-75">Mahasiswa Semester 1-4 yang On-Track (Ahead/Ideal) atau Sudah Lulus</p>
             <h2 class="mb-0" style="font-size: 38px;">{{ $mahasiswas->count() }}</h2>
         </div>
         <i class="fas fa-graduation-cap" style="font-size: 40px; opacity: 0.3;"></i>

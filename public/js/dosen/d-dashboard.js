@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     // Data passed from Blade (should be defined as window.dashboardData)
     if (!window.dashboardData) {
         console.error("Dashboard data not found!");
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     {
                         label: 'Belum / Proses',
                         data: milestoneBelum,
-                        backgroundColor: '#f3f4f6', 
+                        backgroundColor: '#f3f4f6',
                         borderColor: '#94a3b8',
                         borderWidth: 1,
                         borderRadius: 6,
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     {
                         label: 'Sudah Disetujui',
                         data: milestoneSudah,
-                        backgroundColor: '#10b981', 
+                        backgroundColor: '#10b981',
                         borderColor: '#059669',
                         borderWidth: 1,
                         borderRadius: 6,
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { 
+                    legend: {
                         position: 'top',
                         labels: {
                             usePointStyle: true,
@@ -54,24 +54,24 @@ document.addEventListener("DOMContentLoaded", function() {
                         cornerRadius: 8,
                         displayColors: true,
                         callbacks: {
-                            label: function(ctx) {
+                            label: function (ctx) {
                                 return ` ${ctx.dataset.label}: ${ctx.parsed.y} mahasiswa`;
                             }
                         }
                     }
                 },
                 scales: {
-                    x: { 
+                    x: {
                         grid: { display: false },
                         ticks: { font: { family: "'Inter', sans-serif", weight: '500' } }
                     },
-                    y: { 
-                        beginAtZero: true, 
+                    y: {
+                        beginAtZero: true,
                         grid: { color: '#f1f5f9' },
-                        ticks: { 
+                        ticks: {
                             stepSize: 1,
                             font: { family: "'Inter', sans-serif" }
-                        } 
+                        }
                     }
                 },
                 interaction: {
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { 
+                    legend: {
                         position: 'top',
                         labels: {
                             usePointStyle: true,
@@ -153,14 +153,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 },
                 scales: {
-                    x: { 
+                    x: {
                         grid: { display: false },
                         ticks: { font: { family: "'Inter', sans-serif", weight: '500' } }
                     },
-                    y: { 
-                        beginAtZero: true, 
+                    y: {
+                        beginAtZero: true,
                         grid: { color: '#f1f5f9' },
-                        ticks: { stepSize: 1, font: { family: "'Inter', sans-serif" } } 
+                        ticks: { stepSize: 1, font: { family: "'Inter', sans-serif" } }
                     }
                 },
                 interaction: {
@@ -174,15 +174,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // ─── State modal ───────────────────────────────────────
 let currentType = null; // 'bimbingan' | 'milestone'
-let currentId   = null;
+let currentId = null;
 
 function openPengajuanModal(nim, nama, tglPengajuan, rencana, topik, catatan) {
-    document.getElementById('pm-nim').textContent          = nim;
-    document.getElementById('pm-nama').textContent         = nama;
+    document.getElementById('pm-nim').textContent = nim;
+    document.getElementById('pm-nama').textContent = nama;
     document.getElementById('pm-tgl-pengajuan').textContent = tglPengajuan;
-    document.getElementById('pm-rencana').textContent      = rencana;
-    document.getElementById('pm-topik').textContent        = topik;
-    document.getElementById('pm-catatan').textContent      = catatan;
+    document.getElementById('pm-rencana').textContent = rencana;
+    document.getElementById('pm-topik').textContent = topik;
+    document.getElementById('pm-catatan').textContent = catatan;
     openModal('pengajuanModal');
 }
 
@@ -194,27 +194,27 @@ function openBimbinganDetailModal(id, mhsNama, tgl, waktu, tempat, progres, hasi
     document.getElementById('bd-progres').textContent = progres || '-';
     document.getElementById('bd-hasil').textContent = hasil || '-';
     document.getElementById('bd-catatan-mhs').textContent = catatanMhs || '-';
-    
+
     const fileArea = document.getElementById('bd-file-area');
     if (filePath) {
         fileArea.innerHTML = `<a href="${filePath}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-file-download pe-1"></i> Unduh Berkas Bukti</a>`;
     } else {
         fileArea.innerHTML = '<span class="text-muted">Tidak ada berkas diunggah</span>';
     }
-    
+
     openModal('bimbinganDetailModal');
 }
 
 function openVerifikasiModal(nim, nama, jenis, tgl, bukti, catatan) {
-    document.getElementById('vm-nim').textContent    = nim;
-    document.getElementById('vm-nama').textContent   = nama;
-    document.getElementById('vm-jenis').textContent  = jenis;
-    document.getElementById('vm-tgl').textContent    = tgl;
+    document.getElementById('vm-nim').textContent = nim;
+    document.getElementById('vm-nama').textContent = nama;
+    document.getElementById('vm-jenis').textContent = jenis;
+    document.getElementById('vm-tgl').textContent = tgl;
     document.getElementById('vm-catatan').textContent = catatan;
 
     const buktiEl = document.getElementById('vm-bukti');
     let buktiHtml = '';
-    
+
     if (typeof bukti === 'object' && bukti !== null) {
         for (let key in bukti) {
             buktiHtml += `<a href="/storage/${bukti[key]}" target="_blank" class="badge bg-secondary text-decoration-none d-block mb-1" style="color:white; padding: 6px 12px; border-radius: 6px;">📄 ${key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ')}</a>`;
@@ -225,16 +225,16 @@ function openVerifikasiModal(nim, nama, jenis, tgl, bukti, catatan) {
         buktiHtml = '<span style="color:#aaa">-</span>';
     }
     buktiEl.innerHTML = buktiHtml;
-    
+
     openModal('verifikasiModal');
 }
 
 function openVerifikasiBimbinganModal(nim, nama, jadwal, namaDok, catatan, berkas, link) {
-    document.getElementById('vbm-nim').textContent      = nim;
-    document.getElementById('vbm-nama').textContent     = nama;
-    document.getElementById('vbm-jadwal').textContent   = jadwal;
+    document.getElementById('vbm-nim').textContent = nim;
+    document.getElementById('vbm-nama').textContent = nama;
+    document.getElementById('vbm-jadwal').textContent = jadwal;
     document.getElementById('vbm-nama-dok').textContent = namaDok;
-    document.getElementById('vbm-catatan').textContent  = catatan;
+    document.getElementById('vbm-catatan').textContent = catatan;
 
     let berkasHtml = '';
     if (berkas) {
@@ -253,14 +253,14 @@ function openVerifikasiBimbinganModal(nim, nama, jadwal, namaDok, catatan, berka
 
 function openApproveModal(type, id) {
     currentType = type;
-    currentId   = id;
+    currentId = id;
     document.getElementById('approve-catatan').value = '';
     openModal('approveModal');
 }
 
 function openRejectModal(type, id) {
     currentType = type;
-    currentId   = id;
+    currentId = id;
     document.getElementById('reject-catatan').value = '';
     openModal('rejectModal');
 }
@@ -282,14 +282,14 @@ function submitAction(status) {
         // Tolak   -> 'disetujui' (kembali agar mhs bisa up ulang)
         url = `/dosen/update-bimbingan-status/${currentId}`;
         if (status === 'disetujui') finalStatus = 'selesai';
-        if (status === 'ditolak')   finalStatus = 'disetujui';
+        if (status === 'ditolak') finalStatus = 'disetujui';
     } else if (currentType === 'milestone') {
         url = `/dosen/update-milestone-status/${currentId}`;
     }
 
     const form = document.getElementById('actionForm');
     form.action = url;
-    document.getElementById('action-status').value  = finalStatus;
+    document.getElementById('action-status').value = finalStatus;
     document.getElementById('action-catatan').value = catatan;
     form.submit();
 }
@@ -305,8 +305,8 @@ function closeModal(id) {
 }
 
 // Klik di luar modal → tutup
-window.addEventListener('click', function(e) {
-    ['approveModal','rejectModal','pengajuanModal','verifikasiModal','verifikasiBimbinganModal','bimbinganDetailModal'].forEach(function(id) {
+window.addEventListener('click', function (e) {
+    ['approveModal', 'rejectModal', 'pengajuanModal', 'verifikasiModal', 'verifikasiBimbinganModal', 'bimbinganDetailModal'].forEach(function (id) {
         const modal = document.getElementById(id);
         if (e.target === modal) modal.style.display = 'none';
     });

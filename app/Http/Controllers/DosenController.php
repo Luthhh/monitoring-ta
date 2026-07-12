@@ -13,7 +13,12 @@ use App\Models\TugasAkhir;
 
 class DosenController extends Controller
 {
-    // ─── Helper: klasifikasi status TA ─────────────────────────────────────
+    // ─── Klasifikasi Status Tugas Akhir Mahasiswa ────────────────────────────
+    /**
+     * Klasifikasi Status Tugas Akhir Mahasiswa.
+     * 
+     * Menentukan kategori kemajuan (Ahead, Ideal, Behind) untuk masing-masing mahasiswa bimbingan.
+     */
     private function klasifikasiMahasiswas($dosen)
     {
         $now = Carbon::now();
@@ -214,7 +219,6 @@ class DosenController extends Controller
             ];
         }
 
-        // Stats by year for dynamic filtering
         $statsByYear = [];
         $mhsYears = $mahasiswas->pluck('tahun_masuk')->unique()->filter()->values();
         foreach ($mhsYears as $year) {
@@ -297,6 +301,7 @@ class DosenController extends Controller
         return view('dosen.d-profile', compact('user', 'dosen', 'jmlPembimbing1', 'jmlPembimbing2'));
     }
 
+    // ─── Perbarui Profil Dosen ───────────────────────────────────────────────
     /**
      * Perbarui Profil Dosen.
      * 
@@ -328,7 +333,12 @@ class DosenController extends Controller
         return back()->with('success', 'Biodata berhasil diperbarui');
     }
 
-    // ─── Total / Daftar Mahasiswa ─────────────────────────────────────────────
+    // ─── Total Mahasiswa Bimbingan ───────────────────────────────────────────
+    /**
+     * Tampilkan Halaman Total Mahasiswa.
+     * 
+     * Menampilkan daftar semua mahasiswa bimbingan beserta pembagian sebagai Pembimbing 1 dan 2.
+     */
     public function totalMahasiswa()
     {
         $dosen      = Auth::user()->dosen;
@@ -340,6 +350,12 @@ class DosenController extends Controller
         return view('dosen.d-totalmahasiswa', compact('mahasiswas', 'dosen', 'jmlPembimbing1', 'jmlPembimbing2'));
     }
 
+    // ─── Mahasiswa Kategori Ahead ────────────────────────────────────────────
+    /**
+     * Tampilkan Mahasiswa Ahead.
+     * 
+     * Menampilkan daftar mahasiswa bimbingan yang progres tugas akhirnya tergolong cepat (Ahead).
+     */
     public function aheadMahasiswa()
     {
         $dosen      = Auth::user()->dosen;
@@ -347,6 +363,12 @@ class DosenController extends Controller
         return view('dosen.d-aheadmahasiswa', compact('mahasiswas', 'dosen'));
     }
 
+    // ─── Mahasiswa Kategori Ideal ────────────────────────────────────────────
+    /**
+     * Tampilkan Mahasiswa Ideal.
+     * 
+     * Menampilkan daftar mahasiswa bimbingan yang progres tugas akhirnya tergolong tepat waktu (Ideal).
+     */
     public function idealMahasiswa()
     {
         $dosen      = Auth::user()->dosen;
@@ -354,6 +376,12 @@ class DosenController extends Controller
         return view('dosen.d-idealmahasiswa', compact('mahasiswas', 'dosen'));
     }
 
+    // ─── Mahasiswa Kategori Behind ───────────────────────────────────────────
+    /**
+     * Tampilkan Mahasiswa Behind.
+     * 
+     * Menampilkan daftar mahasiswa bimbingan yang progres tugas akhirnya tergolong terlambat (Behind).
+     */
     public function behindMahasiswa()
     {
         $dosen      = Auth::user()->dosen;
@@ -361,7 +389,12 @@ class DosenController extends Controller
         return view('dosen.d-behindmahasiswa', compact('mahasiswas', 'dosen'));
     }
 
-    // ─── Detail Mahasiswa ────────────────────────────────────────────────────
+    // ─── Data Mahasiswa Bimbingan ────────────────────────────────────────────
+    /**
+     * Tampilkan Halaman Data Mahasiswa.
+     * 
+     * Menampilkan tabel/data lengkap seluruh mahasiswa yang dibimbing beserta progres masing-masing.
+     */
     public function dataMahasiswa()
     {
         $dosen      = Auth::user()->dosen;
@@ -369,6 +402,7 @@ class DosenController extends Controller
         return view('dosen.d-datamahasiswa', compact('mahasiswas', 'dosen'));
     }
 
+    // ─── Detail Log Bimbingan Mahasiswa ──────────────────────────────────────
     /**
      * Detail Log Bimbingan Mahasiswa.
      * 
@@ -394,16 +428,24 @@ class DosenController extends Controller
         return view('dosen.d-detail-mahasiswa', compact('mahasiswa', 'dosen', 'tugasAkhir', 'bimbingans', 'milestones'));
     }
 
+    // ─── Aktivitas Bimbingan ─────────────────────────────────────────────────
+    /**
+     * Halaman Aktivitas Bimbingan.
+     * 
+     * Menampilkan daftar bimbingan aktif bulan ini dan daftar mahasiswa yang belum bimbingan > 30 hari.
+     */
     public function aktivitasBimbingan()
     {
         $dosen = Auth::user()->dosen;
         
+        // Klasifikasikan mahasiswa untuk mencari siapa yang pasif > 30 hari
         $mahasiswas = $this->klasifikasiMahasiswas($dosen);
         $tidakBimbingan30 = $mahasiswas->filter(function ($mhs) {
             $last = $mhs->last_bimbingan ?? null;
             return !$last || Carbon::now()->diffInDays(Carbon::parse($last->tanggal)) > 30;
         });
 
+        // Ambil daftar bimbingan mahasiswa bulan ini
         $bimbinganBulanIniList = Bimbingan::with(['tugasAkhir.mahasiswa.user', 'tugasAkhir.milestones', 'tugasAkhir.mahasiswa.pembimbing1', 'tugasAkhir.mahasiswa.pembimbing2'])
             ->where('dosen_id', $dosen->id)
             ->whereIn('status', ['disetujui', 'menunggu_verifikasi', 'selesai'])
@@ -566,7 +608,12 @@ class DosenController extends Controller
         return back()->with('success', 'Pengingat berhasil dikirim ke mahasiswa.');
     }
 
-    // ─── Notifikasi ──────────────────────────────────────────────────────────
+    // ─── Halaman Notifikasi Dosen ────────────────────────────────────────────
+    /**
+     * Halaman Notifikasi Dosen.
+     * 
+     * Menampilkan daftar seluruh notifikasi masuk untuk dosen yang bersangkutan.
+     */
     public function notifikasi()
     {
         $user = Auth::user();
@@ -576,6 +623,7 @@ class DosenController extends Controller
             ->get()
             ->groupBy(fn($n) => Carbon::parse($n->created_at)->format('d F Y'));
 
+        // Otomatis tandai semua notifikasi sebagai telah dibaca ketika halaman dibuka
         Notification::where('user_id', $user->id)
             ->where('is_read', false)
             ->update(['is_read' => true]);
@@ -583,6 +631,12 @@ class DosenController extends Controller
         return view('dosen.d-notifikasi', compact('notifications'));
     }
 
+    // ─── Tandai Notifikasi Dibaca ────────────────────────────────────────────
+    /**
+     * Tandai Notifikasi Dibaca.
+     * 
+     * Mengubah status notifikasi terpilih menjadi telah dibaca (is_read = true).
+     */
     public function markNotifRead(Request $request)
     {
         $ids = $request->ids ?? [];
@@ -592,6 +646,12 @@ class DosenController extends Controller
         return response()->json(['success' => true]);
     }
 
+    // ─── Ambil Notifikasi Belum Dibaca ───────────────────────────────────────
+    /**
+     * Ambil Notifikasi Belum Dibaca.
+     * 
+     * Mengambil maksimal 10 data notifikasi terbaru dosen yang berstatus belum dibaca.
+     */
     public function getUnreadNotifs()
     {
         $notifs = Notification::where('user_id', Auth::id())

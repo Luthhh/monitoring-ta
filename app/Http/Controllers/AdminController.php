@@ -21,7 +21,12 @@ use App\Imports\MahasiswaImport;
 
 class AdminController extends Controller
 {
-    // ─── Helper: Klasifikasi status TA ───────────────────────────────────────
+    // ─── Klasifikasi Status Tugas Akhir Mahasiswa ────────────────────────────
+    /**
+     * Klasifikasi Status Tugas Akhir Mahasiswa.
+     * 
+     * Menentukan kategori kemajuan (Ahead, Ideal, Behind) untuk masing-masing mahasiswa dalam koleksi.
+     */
     private function klasifikasiMahasiswas($mahasiswas)
     {
         $now = Carbon::now();
@@ -178,13 +183,7 @@ class AdminController extends Controller
             }
             return false;
         })->count();
-        $mhsTepatWaktu = $allMhs->filter(function ($mhs) {
-            if ($mhs->semester <= 4) {
-                $hasLulus = $mhs->tugasAkhir && $mhs->tugasAkhir->milestones->where('jenis_milestone', 'SKL')->where('status', 'disetujui')->count() > 0;
-                return $hasLulus;
-            }
-            return false;
-        })->count();
+        $mhsTepatWaktu = $groupTepatWaktuCount;
 
         // Milestone stats per jenis untuk chart
         $milestoneNames = [
@@ -206,7 +205,6 @@ class AdminController extends Controller
             return !$last || now()->diffInDays(Carbon::parse($last->tanggal)) > 30;
         })->count();
 
-        // Stats by year for dynamic filtering
         $statsByYear = [];
         $mhsYears = $allMhs->pluck('tahun_masuk')->unique()->filter()->values();
         foreach ($mhsYears as $year) {
@@ -320,7 +318,7 @@ class AdminController extends Controller
         ));
     }
 
-    // ─── Laporan Kritis, Batas Studi, Lulus Tepat Waktu ──────────────────────
+    // ─── Laporan Mahasiswa Kritis ────────────────────────────────────────────
     /**
      * Laporan Mahasiswa Kritis.
      * 
@@ -343,6 +341,7 @@ class AdminController extends Controller
         return view('admin.a-kritismahasiswa', compact('mahasiswas'));
     }
 
+    // ─── Laporan Batas Studi Mahasiswa ───────────────────────────────────────
     /**
      * Laporan Mahasiswa Mendekati Batas Studi.
      * 
@@ -371,6 +370,7 @@ class AdminController extends Controller
         return view('admin.a-batasstudi', compact('mahasiswas'));
     }
 
+    // ─── Laporan Mahasiswa Lulus Tepat Waktu ─────────────────────────────────
     /**
      * Laporan Mahasiswa Lulus Tepat Waktu.
      * 
@@ -382,18 +382,21 @@ class AdminController extends Controller
         $this->klasifikasiMahasiswas($allMhs);
 
         $mahasiswas = $allMhs->filter(function ($mhs) {
-            if ($mhs->semester <= 4) {
-                $hasLulus = $mhs->tugasAkhir && $mhs->tugasAkhir->milestones->where('jenis_milestone', 'SKL')->where('status', 'disetujui')->count() > 0;
-                return $hasLulus;
-            }
-            return false;
+            $isLulusTepat = $mhs->tugasAkhir && $mhs->tugasAkhir->milestones->where('jenis_milestone', 'SKL')->where('status', 'disetujui')->count() > 0 && $mhs->semester <= 4;
+            $isOnTrack = $mhs->semester <= 4 && ($mhs->status_ta === 'ahead' || $mhs->status_ta === 'ideal');
+            return $isLulusTepat || $isOnTrack;
         });
 
         return view('admin.a-ontrackmahasiswa', compact('mahasiswas'));
     }
 
 
-    // ─── Notifikasi Admin ────────────────────────────────────────────────────
+    // ─── Halaman Notifikasi Admin ────────────────────────────────────────────
+    /**
+     * Halaman Notifikasi Admin.
+     * 
+     * Menampilkan riwayat notifikasi untuk admin dan otomatis menandai semuanya telah dibaca.
+     */
     public function notifikasi()
     {
         $user = auth()->user();
@@ -410,6 +413,12 @@ class AdminController extends Controller
         return view('admin.a-notifikasi', compact('notifications'));
     }
 
+    // ─── Tandai Notifikasi Dibaca ────────────────────────────────────────────
+    /**
+     * Tandai Notifikasi Dibaca.
+     * 
+     * Mengubah status notifikasi terpilih menjadi telah dibaca (is_read = true).
+     */
     public function markNotifRead(Request $request)
     {
         $ids = $request->ids ?? [];
@@ -419,6 +428,12 @@ class AdminController extends Controller
         return response()->json(['success' => true]);
     }
 
+    // ─── Ambil Notifikasi Belum Dibaca ───────────────────────────────────────
+    /**
+     * Ambil Notifikasi Belum Dibaca.
+     * 
+     * Mengambil maksimal 10 data notifikasi terbaru admin yang berstatus belum dibaca.
+     */
     public function getUnreadNotifs()
     {
         $notifs = Notification::where('user_id', auth()->id())
@@ -429,7 +444,7 @@ class AdminController extends Controller
         return response()->json($notifs);
     }
 
-    // ─── Manajemen Dosen ─────────────────────────────────────────────────────
+    // ─── Manajemen Data Dosen ────────────────────────────────────────────────
     /**
      * Manajemen Data Dosen.
      * 
@@ -450,6 +465,12 @@ class AdminController extends Controller
         return view('admin.a-manajemendosen', compact('dosens'));
     }
 
+    // ─── Tambah Data Dosen ───────────────────────────────────────────────────
+    /**
+     * Tambah Data Dosen.
+     * 
+     * Mendaftarkan dosen baru beserta akun pengguna, NIP, dan Program Studi.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -476,6 +497,12 @@ class AdminController extends Controller
         return back()->with('success', 'Dosen berhasil ditambahkan');
     }
 
+    // ─── Perbarui Data Dosen ─────────────────────────────────────────────────
+    /**
+     * Perbarui Data Dosen.
+     * 
+     * Mengubah data biodata dosen (NIP, nama, prodi, email) beserta kata sandi opsional.
+     */
     public function update(Request $request, $id)
     {
         $dosen = Dosen::findOrFail($id);
@@ -499,6 +526,12 @@ class AdminController extends Controller
         return back()->with('success', 'Data dosen berhasil diupdate');
     }
 
+    // ─── Hapus Data Dosen ────────────────────────────────────────────────────
+    /**
+     * Hapus Data Dosen.
+     * 
+     * Menghapus data dosen pembimbing beserta akun pengguna (user) terkait.
+     */
     public function destroy($id)
     {
         $dosen = Dosen::findOrFail($id);
@@ -564,6 +597,12 @@ class AdminController extends Controller
         return view('admin.a-manajemenmahasiswa', compact('mahasiswas', 'tahunMasukList', 'dosens', 'ahead', 'ideal', 'behind'));
     }
 
+    // ─── Tambah Data Mahasiswa ───────────────────────────────────────────────
+    /**
+     * Tambah Data Mahasiswa.
+     * 
+     * Mendaftarkan mahasiswa baru beserta akun pengguna, NIM, program studi, angkatan, dan semester.
+     */
     public function storeMahasiswa(Request $request)
     {
         $request->validate([
@@ -597,6 +636,12 @@ class AdminController extends Controller
         return back()->with('success', 'Mahasiswa berhasil ditambahkan');
     }
 
+    // ─── Perbarui Data Mahasiswa ─────────────────────────────────────────────
+    /**
+     * Perbarui Data Mahasiswa.
+     * 
+     * Mengubah data mahasiswa (NIM, nama, program studi, tahun masuk, semester) beserta password opsional.
+     */
     public function updateMahasiswa(Request $request, $id)
     {
         $mahasiswa = Mahasiswa::findOrFail($id);
@@ -625,6 +670,12 @@ class AdminController extends Controller
         return back()->with('success', 'Data mahasiswa berhasil diupdate');
     }
 
+    // ─── Hapus Data Mahasiswa ────────────────────────────────────────────────
+    /**
+     * Hapus Data Mahasiswa.
+     * 
+     * Menghapus data mahasiswa dari sistem beserta akun pengguna (user) terkait.
+     */
     public function destroyMahasiswa($id)
     {
         $mahasiswa = Mahasiswa::findOrFail($id);
@@ -634,6 +685,11 @@ class AdminController extends Controller
     }
 
     // ─── Total Mahasiswa ─────────────────────────────────────────────────────
+    /**
+     * Tampilkan Halaman Total Mahasiswa.
+     * 
+     * Menampilkan daftar seluruh mahasiswa dengan informasi status, dosen pembimbing, dan milestone.
+     */
     public function totalMahasiswa(Request $request)
     {
         $query = Mahasiswa::with(['user', 'tugasAkhir.milestones', 'tugasAkhir.bimbingans', 'pembimbing1.user', 'pembimbing2.user']);
@@ -669,7 +725,12 @@ class AdminController extends Controller
         return view('admin.a-totalmahasiswa', compact('mahasiswas', 'tahunMasukList', 'dosens'));
     }
 
-    // ─── Kategori TA ─────────────────────────────────────────────────────────
+    // ─── Mahasiswa Kategori Ahead ────────────────────────────────────────────
+    /**
+     * Tampilkan Mahasiswa Ahead.
+     * 
+     * Menampilkan daftar mahasiswa yang progres tugas akhirnya tergolong cepat (Ahead).
+     */
     public function aheadMahasiswa()
     {
         $mahasiswas = Mahasiswa::with(['user', 'tugasAkhir.milestones', 'tugasAkhir.bimbingans'])->get();
@@ -678,6 +739,12 @@ class AdminController extends Controller
         return view('admin.a-aheadmahasiswa', compact('mahasiswas'));
     }
 
+    // ─── Mahasiswa Kategori Ideal ────────────────────────────────────────────
+    /**
+     * Tampilkan Mahasiswa Ideal.
+     * 
+     * Menampilkan daftar mahasiswa yang progres tugas akhirnya tergolong tepat waktu (Ideal).
+     */
     public function idealMahasiswa()
     {
         $mahasiswas = Mahasiswa::with(['user', 'tugasAkhir.milestones', 'tugasAkhir.bimbingans'])->get();
@@ -686,6 +753,12 @@ class AdminController extends Controller
         return view('admin.a-idealmahasiswa', compact('mahasiswas'));
     }
 
+    // ─── Mahasiswa Kategori Behind ───────────────────────────────────────────
+    /**
+     * Tampilkan Mahasiswa Behind.
+     * 
+     * Menampilkan daftar mahasiswa yang progres tugas akhirnya tergolong terlambat (Behind).
+     */
     public function behindMahasiswa()
     {
         $mahasiswas = Mahasiswa::with(['user', 'tugasAkhir.milestones', 'tugasAkhir.bimbingans'])->get();
@@ -694,7 +767,12 @@ class AdminController extends Controller
         return view('admin.a-behindmahasiswa', compact('mahasiswas'));
     }
 
-    // ─── Aktivitas Bimbingan ─────────────────────────────────────────────────
+    // ─── Aktivitas Bimbingan Mahasiswa ───────────────────────────────────────
+    /**
+     * Aktivitas Bimbingan Mahasiswa.
+     * 
+     * Menampilkan daftar mahasiswa yang pasif atau tidak bimbingan selama lebih dari 30 hari.
+     */
     public function aktivitasBimbingan()
     {
         $mahasiswas = Mahasiswa::with(['user', 'tugasAkhir.milestones', 'tugasAkhir.bimbingans'])->get();
@@ -708,7 +786,12 @@ class AdminController extends Controller
         return view('admin.a-aktivitasbimbingan', compact('tidakBimbingan30'));
     }
 
-    // ─── Detail Mahasiswa (Admin view) ───────────────────────────────────────
+    // ─── Detail Informasi Mahasiswa ──────────────────────────────────────────
+    /**
+     * Detail Informasi Mahasiswa.
+     * 
+     * Melihat riwayat lengkap log bimbingan dan status milestone untuk mahasiswa tertentu secara mendalam.
+     */
     public function detailMahasiswa($id)
     {
         $mahasiswa = Mahasiswa::with([
@@ -787,12 +870,24 @@ class AdminController extends Controller
         return Excel::download(new MahasiswaExport($collection), $filename);
     }
 
+    // ─── Export Mahasiswa ke CSV ─────────────────────────────────────────────
+    /**
+     * Export Mahasiswa ke CSV.
+     * 
+     * Mengunduh seluruh data mahasiswa pembimbing dalam format CSV.
+     */
     public function exportMahasiswaCsv()
     {
         return Excel::download(new MahasiswaExport(), 'mahasiswa_' . now()->format('Ymd_His') . '.csv',
             \Maatwebsite\Excel\Excel::CSV, ['Content-Type' => 'text/csv']);
     }
 
+    // ─── Export Dosen ke Excel ───────────────────────────────────────────────
+    /**
+     * Export Dosen ke Excel.
+     * 
+     * Mengunduh seluruh data dosen pembimbing dalam format file Excel (.xlsx).
+     */
     public function exportDosen()
     {
         return Excel::download(new DosenExport(), 'dosen_' . now()->format('Ymd_His') . '.xlsx');
@@ -826,7 +921,12 @@ class AdminController extends Controller
         }
     }
 
-    // ─── Download Template Import ─────────────────────────────────────────────
+    // ─── Download Template Import Mahasiswa ──────────────────────────────────
+    /**
+     * Download Template Import Mahasiswa.
+     * 
+     * Mengunduh template file CSV berisi kolom-kolom yang diperlukan untuk proses impor data mahasiswa secara massal.
+     */
     public function templateImportMahasiswa()
     {
         $headers = ['nim', 'nama', 'email', 'prodi', 'tahun_masuk', 'semester', 'password'];
@@ -845,6 +945,12 @@ class AdminController extends Controller
         ]);
     }
 
+    // ─── Kirim Pengingat Admin ───────────────────────────────────────────────
+    /**
+     * Kirim Pengingat dari Admin.
+     * 
+     * Mengirimkan notifikasi pengingat kepada mahasiswa agar segera melakukan bimbingan atau memperbarui status.
+     */
     public function kirimPengingat(Request $request, $id)
     {
         $mahasiswa = Mahasiswa::findOrFail($id);
@@ -860,7 +966,12 @@ class AdminController extends Controller
         return back()->with('success', 'Pengingat berhasil dikirim ke mahasiswa ' . $mahasiswa->user->name);
     }
 
-    // ─── Dedicated Verification Pages ─────────────────────────────────────────
+    // ─── Halaman Verifikasi Milestone ────────────────────────────────────────
+    /**
+     * Halaman Verifikasi Milestone.
+     * 
+     * Menampilkan daftar milestone mahasiswa yang berstatus 'menunggu_verifikasi'.
+     */
     public function verifikasiMilestone()
     {
         $milestones = Milestone::where('status', 'menunggu_verifikasi')
@@ -871,6 +982,12 @@ class AdminController extends Controller
         return view('admin.verifikasi.milestone', compact('milestones'));
     }
 
+    // ─── Halaman Verifikasi Bimbingan ────────────────────────────────────────
+    /**
+     * Halaman Verifikasi Bimbingan.
+     * 
+     * Menampilkan daftar bimbingan mahasiswa yang berstatus 'menunggu_verifikasi'.
+     */
     public function verifikasiBimbingan()
     {
         $bimbingans = Bimbingan::where('status', 'menunggu_verifikasi')
@@ -881,6 +998,12 @@ class AdminController extends Controller
         return view('admin.verifikasi.bimbingan', compact('bimbingans'));
     }
 
+    // ─── Halaman Verifikasi BAP ──────────────────────────────────────────────
+    /**
+     * Halaman Verifikasi BAP.
+     * 
+     * Menampilkan daftar milestone yang sudah disetujui dosen pembimbing tetapi belum diunggah BAP-nya oleh admin.
+     */
     public function verifikasiBap()
     {
         $baps = Milestone::where('status', 'disetujui')
@@ -906,6 +1029,7 @@ class AdminController extends Controller
         return view('admin.a-profile', compact('user'));
     }
 
+    // ─── Perbarui Profil Admin ───────────────────────────────────────────────
     /**
      * Update Profil Admin.
      * 
@@ -932,6 +1056,7 @@ class AdminController extends Controller
         return back()->with('success', 'Profil berhasil diupdate');
     }
 
+    // ─── Unggah Berita Acara (BAP) ───────────────────────────────────────────
     /**
      * Unggah Berita Acara (BAP).
      * 

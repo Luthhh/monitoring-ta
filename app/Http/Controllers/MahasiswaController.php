@@ -30,6 +30,7 @@ class MahasiswaController extends Controller
         '11' => 'SKL',
     ];
 
+    // ─── Dashboard Mahasiswa ─────────────────────────────────────────────────
     /**
      * Menampilkan Dashboard Mahasiswa.
      * 
@@ -54,6 +55,7 @@ class MahasiswaController extends Controller
         return view('mahasiswa.m-dashboard', compact('user', 'mahasiswa', 'tugasAkhir', 'milestones', 'milestoneMapping', 'bimbingans'));
     }
 
+    // ─── Profil Mahasiswa ────────────────────────────────────────────────────
     /**
      * Menampilkan Profil Mahasiswa.
      * 
@@ -69,6 +71,7 @@ class MahasiswaController extends Controller
         return view('mahasiswa.m-profile', compact('user', 'mahasiswa', 'tugasAkhir', 'dosens'));
     }
 
+    // ─── Perbarui Profil Mahasiswa ───────────────────────────────────────────
     /**
      * Memperbarui Profil Mahasiswa.
      * 
@@ -115,6 +118,12 @@ class MahasiswaController extends Controller
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
 
+    // ─── Perbarui Dosen Pembimbing ───────────────────────────────────────────
+    /**
+     * Perbarui Dosen Pembimbing.
+     * 
+     * Mengubah data Dosen Pembimbing 1 dan Dosen Pembimbing 2 untuk mahasiswa yang bersangkutan.
+     */
     public function updatePembimbing(Request $request)
     {
         $mahasiswa = Auth::user()->mahasiswa;
@@ -132,8 +141,18 @@ class MahasiswaController extends Controller
         return back()->with('success', 'Dosen pembimbing berhasil diperbarui.');
     }
 
+    // ─── Perbarui Judul Tugas Akhir ─────────────────────────────────────────
+    /**
+     * Perbarui Judul Tugas Akhir.
+     * 
+     * Mengubah atau menginisialisasi judul Tugas Akhir mahasiswa.
+     */
     public function updateJudul(Request $request)
     {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+        ]);
+
         $mahasiswa = Auth::user()->mahasiswa;
         $ta = $mahasiswa->tugasAkhir;
 
@@ -150,6 +169,12 @@ class MahasiswaController extends Controller
         return back()->with('success', 'Judul Tugas Akhir berhasil diperbarui.');
     }
 
+    // ─── Tambah Pengajuan Bimbingan ──────────────────────────────────────────
+    /**
+     * Halaman Tambah Bimbingan.
+     * 
+     * Menampilkan form pengajuan jadwal bimbingan baru dengan pilihan dosen pembimbing yang bersangkutan.
+     */
     public function createBimbingan()
     {
         $user = Auth::user();
@@ -160,6 +185,7 @@ class MahasiswaController extends Controller
         return view('mahasiswa.tambah-bimbingan', compact('mahasiswa', 'dosens'));
     }
 
+    // ─── Simpan Pengajuan Bimbingan ──────────────────────────────────────────
     /**
      * Menyimpan Pengajuan Bimbingan Baru.
      * 
@@ -210,6 +236,7 @@ class MahasiswaController extends Controller
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Bimbingan berhasil dicatat/diajukan.');
     }
 
+    // ─── Upload Bukti Bimbingan ──────────────────────────────────────────────
     /**
      * Mengunggah Bukti Pelaksanaan Bimbingan.
      * 
@@ -254,6 +281,12 @@ class MahasiswaController extends Controller
         return back()->with('error', 'Gagal mengupload bukti.');
     }
 
+    // ─── Hapus Pengajuan Bimbingan ───────────────────────────────────────────
+    /**
+     * Hapus Pengajuan Bimbingan.
+     * 
+     * Menghapus pengajuan bimbingan yang masih berstatus 'pending'.
+     */
     public function deleteBimbingan($id)
     {
         $bimbingan = Bimbingan::findOrFail($id);
@@ -264,6 +297,12 @@ class MahasiswaController extends Controller
         return back()->with('error', 'Hanya pengajuan dengan status pending yang dapat dihapus.');
     }
 
+    // ─── Perbarui Timeline Milestone ─────────────────────────────────────────
+    /**
+     * Perbarui Timeline Milestone.
+     * 
+     * Mengubah atau menetapkan tanggal tenggat waktu (deadline) untuk setiap tahapan milestone tugas akhir.
+     */
     public function updateTimeline(Request $request)
     {
         $mahasiswa = Auth::user()->mahasiswa;
@@ -306,6 +345,7 @@ class MahasiswaController extends Controller
         return back()->with('success', 'Seluruh timeline berhasil diperbarui.');
     }
 
+    // ─── Upload Bukti Milestone ──────────────────────────────────────────────
     /**
      * Mengunggah Bukti Capaian Milestone.
      * 
@@ -396,6 +436,12 @@ class MahasiswaController extends Controller
         return back()->with('error', 'Gagal mengupload bukti.');
     }
 
+    // ─── Halaman Notifikasi Mahasiswa ────────────────────────────────────────
+    /**
+     * Halaman Notifikasi Mahasiswa.
+     * 
+     * Menampilkan riwayat notifikasi untuk mahasiswa dan otomatis menandai semuanya telah dibaca.
+     */
     public function notifikasi()
     {
         $user = Auth::user();
@@ -411,6 +457,12 @@ class MahasiswaController extends Controller
         return view('mahasiswa.m-notifikasi', compact('notifications'));
     }
 
+    // ─── Tandai Notifikasi Dibaca ────────────────────────────────────────────
+    /**
+     * Tandai Notifikasi Dibaca.
+     * 
+     * Mengubah status notifikasi yang dipilih oleh mahasiswa menjadi telah dibaca.
+     */
     public function markNotifRead(Request $request)
     {
         Notification::where('user_id', Auth::id())
@@ -419,6 +471,12 @@ class MahasiswaController extends Controller
         return response()->json(['success' => true]);
     }
 
+    // ─── Ambil Notifikasi Belum Dibaca ───────────────────────────────────────
+    /**
+     * Ambil Notifikasi Belum Dibaca.
+     * 
+     * Mengambil 10 notifikasi terbaru yang belum dibaca dalam format JSON untuk widget/dropdown.
+     */
     public function getUnreadNotifs()
     {
         $notifs = Notification::where('user_id', Auth::id())
